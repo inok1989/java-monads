@@ -8,11 +8,6 @@ public class Success<T> implements Result<T> {
     private final String successMessage;
     private final T object;
 
-    Success(T object) {
-        this.successMessage = null;
-        this.object = object;
-    }
-
     Success(String successMessage, T object) {
         this.successMessage = successMessage;
         this.object = object;

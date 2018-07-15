@@ -12,6 +12,9 @@ import java.util.function.Supplier;
  */
 public interface Result<T> {
 
+    String SUCCESS = "SUCCESS";
+    String INTERNAL_FAILURE = "INTERNAL_FAILURE";
+
     boolean isError();
 
     boolean isInternalError();
@@ -35,10 +38,10 @@ public interface Result<T> {
     Throwable getThrowable();
 
     static <T> Result<T> of(T result) {
-        return new Success<>(result);
+        return new Success<>(SUCCESS, result);
     }
 
-    static <T> Result<T> emptySuccess(String successMessage) {
+    static Result<Void> emptySuccess(String successMessage) {
         return new Success<>(successMessage, null);
     }
 
@@ -65,7 +68,7 @@ public interface Result<T> {
     }
 
     static <T> Result<T> fail(Throwable throwable) {
-        return new InternalFailure<>(throwable);
+        return new InternalFailure<>(INTERNAL_FAILURE, throwable);
     }
 
     default <U> Result<U> map(Function<? super T, U> mapper) {
@@ -84,6 +87,16 @@ public interface Result<T> {
         }
     }
 
+    default Result<T> filter(Predicate<T> predicate, String failureMessage) {
+        return flatMap(result -> {
+            if (predicate.test(result)) {
+                return this;
+            } else {
+                return Result.fail(failureMessage);
+            }
+        });
+    }
+
     default T orElse(T otherObject) {
         if (isSuccess()) {
             return getObject();
@@ -100,21 +113,11 @@ public interface Result<T> {
         }
     }
 
-    default T getElseThrow() {
+    default T orElseThrow() {
         if (isSuccess()) {
             return getObject();
         } else {
             throw new UnCheckedException(getErrorMessage());
         }
-    }
-
-    default Result<T> filter(Predicate<T> predicate, String failureMessage) {
-        return flatMap(result -> {
-            if (predicate.test(result)) {
-                return this;
-            } else {
-                return Result.fail(failureMessage);
-            }
-        });
     }
 }

@@ -54,4 +54,13 @@ public class OptionalIterator<E> {
         }
     }
 
+    public void nextWithMatch(Predicate<E> predicate) {
+        next();
+        while (!testOnCurrent(predicate)) {
+            next();
+            if (!hasCurrent()) {
+                break;
+            }
+        }
+    }
 }

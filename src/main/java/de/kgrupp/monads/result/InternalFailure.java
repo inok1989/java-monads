@@ -7,8 +7,8 @@ public class InternalFailure<T> extends Failure<T> {
 
     private final Throwable throwable;
 
-    InternalFailure(Throwable throwable) {
-        super("Internal Failure.");
+    InternalFailure(String errorMessage, Throwable throwable) {
+        super(errorMessage);
         this.throwable = throwable;
     }
 

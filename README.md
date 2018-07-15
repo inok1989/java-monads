@@ -1,2 +1,2 @@
-# inoks-java-utils
-A set of java classes which are helpful for developing with java 8
+# inoks-java-monads
+A set of java classes to enable monadic programming.
