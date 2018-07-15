@@ -1,35 +1,36 @@
 package de.kgrupp.monads.data;
 
 import de.kgrupp.monads.exception.UnCheckedException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class OptionalIteratorTest {
+class OptionalIteratorTest {
 
     private List<String> list = Arrays.asList("A", "B");
     private OptionalIterator<String> iterator;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+     void setUp() {
         iterator = new OptionalIterator<>(list);
     }
 
     @Test
-    public void testInitialChecks() {
+     void testInitialChecks() {
         assertTrue(iterator.hasNext());
         assertTrue(iterator.hasCurrent());
     }
 
     @Test
-    public void testGetCurrent() {
+     void testGetCurrent() {
         assertEquals("A", iterator.getCurrent());
         assertEquals(Optional.of("A"), iterator.getSafeCurrent());
         iterator.next();
@@ -37,22 +38,22 @@ public class OptionalIteratorTest {
         assertEquals(Optional.of("B"), iterator.getSafeCurrent());
     }
 
-    @Test(expected = UnCheckedException.class)
-    public void testGetIfEmtpy() {
+    @Test
+     void testGetIfEmtpy() {
         iterator.next();
         iterator.next();
-        iterator.getCurrent();
+        assertThrows(UnCheckedException.class, iterator::getCurrent);
     }
 
     @Test
-    public void testGetSafeIfEmtpy() {
+     void testGetSafeIfEmtpy() {
         iterator.next();
         iterator.next();
         assertFalse(iterator.getSafeCurrent().isPresent());
     }
 
     @Test
-    public void testTestOnCurrent() {
+     void testTestOnCurrent() {
         assertTrue(iterator.testOnCurrent("A"::equals));
         assertFalse(iterator.testOnCurrent("B"::equals));
         iterator.next();
@@ -62,13 +63,13 @@ public class OptionalIteratorTest {
     }
 
     @Test
-    public void testNextWithMatchNotFound() {
+     void testNextWithMatchNotFound() {
         iterator.nextWithMatch("A"::equals);
         assertFalse(iterator.getSafeCurrent().isPresent());
     }
 
     @Test
-    public void testNextWithMatchFound() {
+    void testNextWithMatchFound() {
         iterator.nextWithMatch("B"::equals);
         assertTrue(iterator.getSafeCurrent().isPresent());
     }

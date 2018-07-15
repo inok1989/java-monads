@@ -1,7 +1,7 @@
 package de.kgrupp.monads.result;
 
 import de.kgrupp.monads.exception.UnCheckedException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
@@ -14,15 +14,15 @@ import static de.kgrupp.monads.result.AbstractResultTest.FAILURE;
 import static de.kgrupp.monads.result.AbstractResultTest.INTERNAL_FAILURE;
 import static de.kgrupp.monads.result.AbstractResultTest.SUCCESS;
 import static de.kgrupp.monads.result.AbstractResultTest.SUCCESS_WITH_MESSAGE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ResultBasicMethodTest {
+class ResultBasicMethodTest {
 
     @Test
-    public void testIsError() {
+    void testIsError() {
         assertTrue(FAILURE.isError());
         assertTrue(INTERNAL_FAILURE.isError());
         assertFalse(SUCCESS.isError());
@@ -31,7 +31,7 @@ public class ResultBasicMethodTest {
     }
 
     @Test
-    public void testIsInternalError() {
+     void testIsInternalError() {
         assertFalse(FAILURE.isInternalError());
         assertTrue(INTERNAL_FAILURE.isInternalError());
         assertFalse(SUCCESS.isInternalError());
@@ -40,7 +40,7 @@ public class ResultBasicMethodTest {
     }
 
     @Test
-    public void testIsSuccess() {
+     void testIsSuccess() {
         assertFalse(FAILURE.isSuccess());
         assertFalse(INTERNAL_FAILURE.isSuccess());
         assertTrue(SUCCESS.isSuccess());
@@ -48,18 +48,18 @@ public class ResultBasicMethodTest {
         assertTrue(EMPTY_SUCCESS.isSuccess());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testGetObjectFailsOnFailure() {
-        FAILURE.getObject();
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testGetObjectFailsOnInternalFailure() {
-        INTERNAL_FAILURE.getObject();
+    @Test
+     void testGetObjectFailsOnFailure() {
+        assertThrows(UnsupportedOperationException.class, FAILURE::getObject);
     }
 
     @Test
-    public void testAsOptional() {
+     void testGetObjectFailsOnInternalFailure() {
+        assertThrows(UnsupportedOperationException.class, INTERNAL_FAILURE::getObject);
+    }
+
+    @Test
+     void testAsOptional() {
         assertFalse(FAILURE.asOptional().isPresent());
         assertFalse(INTERNAL_FAILURE.asOptional().isPresent());
         assertTrue(SUCCESS.asOptional().isPresent());
@@ -68,104 +68,104 @@ public class ResultBasicMethodTest {
     }
 
     @Test
-    public void testGetSuccessMessage() {
+     void testGetSuccessMessage() {
         assertEquals(Result.SUCCESS, SUCCESS.getSuccessMessage());
         assertEquals(SUCCESS_MESSAGE, SUCCESS_WITH_MESSAGE.getSuccessMessage());
         assertEquals(SUCCESS_MESSAGE, EMPTY_SUCCESS.getSuccessMessage());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testGetSuccessMessageFails() {
-        FAILURE.getSuccessMessage();
+    @Test
+     void testGetSuccessMessageFails() {
+        assertThrows(UnsupportedOperationException.class, FAILURE::getSuccessMessage);
     }
 
     @Test
-    public void testGetErrorMessage() {
+     void testGetErrorMessage() {
         assertEquals(ERROR_MESSAGE, FAILURE.getErrorMessage());
         assertEquals(Result.INTERNAL_FAILURE, INTERNAL_FAILURE.getErrorMessage());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testGetErrorMessageFails() {
-        SUCCESS.getErrorMessage();
+    @Test
+     void testGetErrorMessageFails() {
+        assertThrows(UnsupportedOperationException.class, SUCCESS::getErrorMessage);
     }
 
     @Test
-    public void testGetThrowable() {
+     void testGetThrowable() {
         assertEquals(EXCEPTION, INTERNAL_FAILURE.getThrowable());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testGetThrowableFailsForSuccess() {
-        assertNotNull(EMPTY_SUCCESS.getThrowable());
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testGetThrowableFailsForFailure() {
-        assertNotNull(FAILURE.getThrowable());
+    @Test
+     void testGetThrowableFailsForSuccess() {
+        assertThrows(UnsupportedOperationException.class, EMPTY_SUCCESS::getThrowable);
     }
 
     @Test
-    public void testOfOptionalSuccess() {
+     void testGetThrowableFailsForFailure() {
+        assertThrows(UnsupportedOperationException.class, FAILURE::getThrowable);
+    }
+
+    @Test
+     void testOfOptionalSuccess() {
         Result<String> result = Result.of(Optional.of(RESULT_OBJECT), ERROR_MESSAGE);
         assertTrue(result.isSuccess());
         assertEquals(RESULT_OBJECT, result.getObject());
     }
 
     @Test
-    public void testOfOptionalError() {
+     void testOfOptionalError() {
         Result<String> result = Result.of(Optional.empty(), ERROR_MESSAGE);
         assertTrue(result.isError());
         assertFalse(result.isInternalError());
     }
 
     @Test
-    public void testOfOptionalInternalError() {
+     void testOfOptionalInternalError() {
         Result<String> result = Result.of(Optional.empty(), () -> EXCEPTION);
         assertTrue(result.isError());
         assertTrue(result.isInternalError());
     }
 
     @Test
-    public void testOfNullableSuccess() {
+     void testOfNullableSuccess() {
         Result<String> result = Result.ofNullable(RESULT_OBJECT, ERROR_MESSAGE);
         assertTrue(result.isSuccess());
         assertEquals(RESULT_OBJECT, result.getObject());
     }
 
     @Test
-    public void testOfNullableError() {
+     void testOfNullableError() {
         Result<String> result = Result.ofNullable(null, ERROR_MESSAGE);
         assertTrue(result.isError());
         assertFalse(result.isInternalError());
     }
 
     @Test
-    public void testOrElse() {
+     void testOrElse() {
         assertEquals(RESULT_OBJECT, SUCCESS.orElse("OTHER"));
         assertEquals(RESULT_OBJECT, FAILURE.orElse(RESULT_OBJECT));
         assertEquals(RESULT_OBJECT, INTERNAL_FAILURE.orElse(RESULT_OBJECT));
     }
 
     @Test
-    public void testOrElseGet() {
+     void testOrElseGet() {
         assertEquals(RESULT_OBJECT, SUCCESS.orElseGet(() -> "OTHER"));
         assertEquals(RESULT_OBJECT, FAILURE.orElseGet(() -> RESULT_OBJECT));
         assertEquals(RESULT_OBJECT, INTERNAL_FAILURE.orElseGet(() -> RESULT_OBJECT));
     }
 
     @Test
-    public void getElseThrow() {
+     void getElseThrow() {
         assertEquals(RESULT_OBJECT, SUCCESS.orElseThrow());
     }
 
-    @Test(expected = UnCheckedException.class)
-    public void getElseThrowFailure() {
-        FAILURE.orElseThrow();
+    @Test
+     void getElseThrowFailure() {
+        assertThrows(UnCheckedException.class, FAILURE::orElseThrow);
     }
 
-    @Test(expected = UnCheckedException.class)
-    public void getElseThrowInternalFailure() {
-        INTERNAL_FAILURE.orElseThrow();
+    @Test
+     void getElseThrowInternalFailure() {
+        assertThrows(UnCheckedException.class, INTERNAL_FAILURE::orElseThrow);
     }
 }

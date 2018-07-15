@@ -1,28 +1,29 @@
 package de.kgrupp.monads.result;
 
 import de.kgrupp.monads.exception.UnCheckedException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class HelperTest {
+class HelperTest {
 
-    @Test(expected = UnCheckedException.class)
-    public void testTransformSuccess() {
+    @Test
+    void testTransformSuccess() {
         // not possible for success
-        Helper.transform(AbstractResultTest.SUCCESS);
+        assertThrows(UnCheckedException.class, () -> Helper.transform(AbstractResultTest.SUCCESS));
     }
 
     @Test
-    public void testTransformFailure() {
+    void testTransformFailure() {
         Result<Integer> result = Helper.transform(AbstractResultTest.FAILURE);
         assertTrue(result.isError());
         assertFalse(result.isInternalError());
     }
 
     @Test
-    public void testTransformInternalFailure() {
+    void testTransformInternalFailure() {
         Result<Integer> result = Helper.transform(AbstractResultTest.INTERNAL_FAILURE);
         assertTrue(result.isError());
         assertTrue(result.isInternalError());
