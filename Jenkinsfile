@@ -9,7 +9,7 @@ node {
         stage('Build') {
             echo "My branch is: ${env.BRANCH_NAME}"
             withSonarQubeEnv('localhostSonarQube') {
-                bat "gradlew.bat --info clean build sonarqube -Pinoks.java.monads.version=${version}"
+                bat "gradlew.bat --info clean build sonarqube -Dinoks.java.monads.version=${version}"
             }
             currentBuild.description = version
         }
