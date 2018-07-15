@@ -12,7 +12,7 @@ apply plugin: 'java'
 apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'jacoco'
 
-version = System.properties['inoks.java.monads.debug'] == "true" ? "LOCAL-VERSION" : project['inoks.java.monads.version']
+version = System.properties['inoks.java.monads.debug'] == "true" || !System.properties['inoks.java.monads.version'] ? "LOCAL-VERSION" : project['inoks.java.monads.version']
 
 sourceCompatibility = 1.8
 
@@ -25,8 +25,10 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok:1.18.0'
 
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.0.1'
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.0.1'
-    testRuntime group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '4.12.0'
-    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.0.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.1'
+}
+
+test {
+    useJUnitPlatform()
 }
