@@ -21,10 +21,6 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.jetbrains', name: 'annotations', version: '15.0'
-
-    compileOnly 'org.projectlombok:lombok:1.18.0'
-
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.1'
 }
