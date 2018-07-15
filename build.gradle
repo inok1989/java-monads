@@ -4,7 +4,10 @@ plugins {
 
 apply plugin: 'java'
 
-version = System.properties['inoks.java.monads.debug'] == "true" || !System.properties['inoks.java.monads.version'] ? "LOCAL-VERSION" : project['inoks.java.monads.version']
+group = 'de.kgrupp'
+def isDebug = System.properties['inoks.java.monads.debug'] == "true"
+def versionStr = System.properties['inoks.java.monads.version']
+version = isDebug || !versionStr ? "LOCAL-VERSION" : versionStr
 
 sourceCompatibility = 1.8
 
