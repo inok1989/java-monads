@@ -5,15 +5,15 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static de.kgrupp.monads.result.AbstractResultTest.ERROR_MESSAGE;
-import static de.kgrupp.monads.result.AbstractResultTest.EXCEPTION;
-import static de.kgrupp.monads.result.AbstractResultTest.RESULT_OBJECT;
-import static de.kgrupp.monads.result.AbstractResultTest.SUCCESS_MESSAGE;
-import static de.kgrupp.monads.result.AbstractResultTest.EMPTY_SUCCESS;
-import static de.kgrupp.monads.result.AbstractResultTest.FAILURE;
-import static de.kgrupp.monads.result.AbstractResultTest.INTERNAL_FAILURE;
-import static de.kgrupp.monads.result.AbstractResultTest.SUCCESS;
-import static de.kgrupp.monads.result.AbstractResultTest.SUCCESS_WITH_MESSAGE;
+import static de.kgrupp.monads.result.AbstractResultExamples.ERROR_MESSAGE;
+import static de.kgrupp.monads.result.AbstractResultExamples.EXCEPTION;
+import static de.kgrupp.monads.result.AbstractResultExamples.RESULT_OBJECT;
+import static de.kgrupp.monads.result.AbstractResultExamples.SUCCESS_MESSAGE;
+import static de.kgrupp.monads.result.AbstractResultExamples.EMPTY_SUCCESS;
+import static de.kgrupp.monads.result.AbstractResultExamples.FAILURE;
+import static de.kgrupp.monads.result.AbstractResultExamples.INTERNAL_FAILURE;
+import static de.kgrupp.monads.result.AbstractResultExamples.SUCCESS;
+import static de.kgrupp.monads.result.AbstractResultExamples.SUCCESS_WITH_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;

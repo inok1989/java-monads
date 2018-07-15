@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
-import static de.kgrupp.monads.result.AbstractResultTest.ERROR_MESSAGE;
-import static de.kgrupp.monads.result.AbstractResultTest.FAILURE;
-import static de.kgrupp.monads.result.AbstractResultTest.INTERNAL_FAILURE;
-import static de.kgrupp.monads.result.AbstractResultTest.SUCCESS;
+import static de.kgrupp.monads.result.AbstractResultExamples.ERROR_MESSAGE;
+import static de.kgrupp.monads.result.AbstractResultExamples.FAILURE;
+import static de.kgrupp.monads.result.AbstractResultExamples.INTERNAL_FAILURE;
+import static de.kgrupp.monads.result.AbstractResultExamples.SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

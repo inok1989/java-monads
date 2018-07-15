@@ -12,19 +12,19 @@ class HelperTest {
     @Test
     void testTransformSuccess() {
         // not possible for success
-        assertThrows(UnCheckedException.class, () -> Helper.transform(AbstractResultTest.SUCCESS));
+        assertThrows(UnCheckedException.class, () -> Helper.transform(AbstractResultExamples.SUCCESS));
     }
 
     @Test
     void testTransformFailure() {
-        Result<Integer> result = Helper.transform(AbstractResultTest.FAILURE);
+        Result<Integer> result = Helper.transform(AbstractResultExamples.FAILURE);
         assertTrue(result.isError());
         assertFalse(result.isInternalError());
     }
 
     @Test
     void testTransformInternalFailure() {
-        Result<Integer> result = Helper.transform(AbstractResultTest.INTERNAL_FAILURE);
+        Result<Integer> result = Helper.transform(AbstractResultExamples.INTERNAL_FAILURE);
         assertTrue(result.isError());
         assertTrue(result.isInternalError());
     }

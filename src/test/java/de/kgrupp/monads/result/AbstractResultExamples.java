@@ -1,8 +1,8 @@
 package de.kgrupp.monads.result;
 
-final class AbstractResultTest {
+final class AbstractResultExamples {
 
-    private AbstractResultTest() {
+    private AbstractResultExamples() {
         // constants
     }
 

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ResultUtilsTest {
 
     private static final List<Result<String>> LIST = Arrays.asList(Result.of("A"), Result.of("B"));
-    private static final List<Result<String>> LIST_WITH_ERRORS = Arrays.asList(Result.of("A"), Result.fail(AbstractResultTest.ERROR_MESSAGE), Result.of("B"));
+    private static final List<Result<String>> LIST_WITH_ERRORS = Arrays.asList(Result.of("A"), Result.fail(AbstractResultExamples.ERROR_MESSAGE), Result.of("B"));
 
     @Test
     void testCombine() {
