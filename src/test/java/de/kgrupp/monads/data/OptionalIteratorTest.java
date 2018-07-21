@@ -1,11 +1,11 @@
 package de.kgrupp.monads.data;
 
-import de.kgrupp.monads.exception.UnCheckedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,7 +42,7 @@ class OptionalIteratorTest {
      void testGetIfEmtpy() {
         iterator.next();
         iterator.next();
-        assertThrows(UnCheckedException.class, iterator::getCurrent);
+        assertThrows(NoSuchElementException.class, iterator::getCurrent);
     }
 
     @Test

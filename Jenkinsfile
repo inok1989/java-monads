@@ -1,4 +1,4 @@
-String version = "0.1.0.${env.BUILD_NUMBER}"
+String version = "0.2.0.${env.BUILD_NUMBER}"
 
 node {
     try {

@@ -1,7 +1,5 @@
 package de.kgrupp.monads.result;
 
-import de.kgrupp.monads.exception.UnCheckedException;
-
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -117,7 +115,7 @@ public interface Result<T> {
         if (isSuccess()) {
             return getObject();
         } else {
-            throw new UnCheckedException(getErrorMessage());
+            throw new ResultException(getErrorMessage());
         }
     }
 }

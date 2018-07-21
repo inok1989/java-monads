@@ -1,8 +1,7 @@
 package de.kgrupp.monads.data;
 
-import de.kgrupp.monads.exception.UnCheckedException;
-
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -29,7 +28,7 @@ public class OptionalIterator<E> {
 
     public E getCurrent() {
         if (current == null) {
-            throw new UnCheckedException("Not possible to get current");
+            throw new NoSuchElementException("Not possible to get current");
         }
         return current;
     }

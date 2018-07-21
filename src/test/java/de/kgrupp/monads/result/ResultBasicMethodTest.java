@@ -1,6 +1,5 @@
 package de.kgrupp.monads.result;
 
-import de.kgrupp.monads.exception.UnCheckedException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -161,11 +160,11 @@ class ResultBasicMethodTest {
 
     @Test
      void getElseThrowFailure() {
-        assertThrows(UnCheckedException.class, FAILURE::orElseThrow);
+        assertThrows(ResultException.class, FAILURE::orElseThrow);
     }
 
     @Test
      void getElseThrowInternalFailure() {
-        assertThrows(UnCheckedException.class, INTERNAL_FAILURE::orElseThrow);
+        assertThrows(ResultException.class, INTERNAL_FAILURE::orElseThrow);
     }
 }

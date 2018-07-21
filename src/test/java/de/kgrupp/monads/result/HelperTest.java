@@ -1,6 +1,5 @@
 package de.kgrupp.monads.result;
 
-import de.kgrupp.monads.exception.UnCheckedException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -12,7 +11,7 @@ class HelperTest {
     @Test
     void testTransformSuccess() {
         // not possible for success
-        assertThrows(UnCheckedException.class, () -> Helper.transform(AbstractResultExamples.SUCCESS));
+        assertThrows(IllegalArgumentException.class, () -> Helper.transform(AbstractResultExamples.SUCCESS));
     }
 
     @Test

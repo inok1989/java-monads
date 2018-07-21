@@ -3,6 +3,7 @@ plugins {
 }
 
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 group = 'de.kgrupp'
 def isDebug = System.properties['inoks.java.monads.debug'] == "true"
@@ -28,5 +29,49 @@ sonarqube {
     properties {
         property 'sonar.projectKey', 'inoks-java-monads'
         property 'sonar.projectName', 'inoks-java-monads'
+    }
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier "sources"
+}
+
+publishing {
+    publications {
+        myPublication(MavenPublication) {
+            from components.java
+            artifact sourceJar
+            artifact ('README.md') {
+                classifier = 'README'
+                extension  = 'md'
+            }
+            pom {
+                name = "Inoks Java Monads"
+                description = "A set of java classes to enable monadic programming."
+                url = "https://github.com/inok1989/java-monads"
+                licenses {
+                    license {
+                        name = "MIT License"
+                        url = "https://opensource.org/licenses/mit-license"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "inok1989"
+                        name = "Konstantin Grupp"
+                        email = "coding@konstantin-grupp.de"
+                    }
+                }
+                scm {
+                    connection = "scm:git:git:https://github.com/inok1989/java-monads.git"
+                    developerConnection = "scm:git:ssh://git@github.com/jenkinsci/jenkins.git"
+                    url = "https://github.com/inok1989/java-monads"
+                }
+            }
+        }
+    }
+    repositories {
+        mavenLocal()
     }
 }

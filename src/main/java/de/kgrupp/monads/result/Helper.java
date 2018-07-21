@@ -1,8 +1,6 @@
 package de.kgrupp.monads.result;
 
 
-import de.kgrupp.monads.exception.UnCheckedException;
-
 /**
  * @author Konstantin Grupp
  */
@@ -22,7 +20,7 @@ final class Helper {
         } else if (result.isError()) {
             return Result.fail(result.getErrorMessage());
         } else {
-            throw new UnCheckedException(SUCCESS_CAN_NOT_BE_CONVERTED);
+            throw new IllegalArgumentException(SUCCESS_CAN_NOT_BE_CONVERTED);
         }
     }
 }
