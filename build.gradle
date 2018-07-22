@@ -40,14 +40,18 @@ task sourceJar(type: Jar) {
     classifier "sources"
 }
 
+def nexusUrl = project.hasProperty('nexusUrl') ? nexusUrl : 'http://localhost:8081'
+def nexusUser = project.hasProperty('nexusUsername') ? nexusUsername : ''
+def nexusPw = project.hasProperty('nexusPassword') ? nexusPassword : ''
+
 uploadArchives {
     repositories {
         mavenDeployer {
             repository(url: "${nexusUrl}/repository/maven-releases/") {
-                authentication(userName: nexusUsername, password: nexusPassword)
+                authentication(userName: nexusUser, password: nexusPw)
             }
             snapshotRepository(url: "${nexusUrl}/repository/maven-snapshots") {
-                authentication(userName: nexusUsername, password: nexusPassword)
+                authentication(userName: nexusUser, password: nexusPw)
             }
         }
     }
