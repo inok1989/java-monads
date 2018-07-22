@@ -16,7 +16,7 @@ node {
         stage('Archive') {
             archiveArtifacts artifacts: 'build/**/*.jar'
             withCredentials([usernamePassword(credentialsId: 'nexus', passwordVariable: 'nexusPassword', usernameVariable: 'nexusUsername')]) {
-                bat "gradlew.bat --info upload -Dinoks.java.monads.version=${version}"
+                bat "gradlew.bat --info upload -Dinoks.java.monads.version=${version} -PnexusUsername=${nexusUsername} -PnexusPassword=${nexusPassword}"
             }
         }
     } catch (Throwable t) {

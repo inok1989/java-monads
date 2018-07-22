@@ -41,8 +41,8 @@ task sourceJar(type: Jar) {
 }
 
 def nexusUrl = project.hasProperty('nexusUrl') ? nexusUrl : 'http://localhost:8081'
-def nexusUser = project.hasProperty('nexusUsername') ? nexusUsername : ''
-def nexusPw = project.hasProperty('nexusPassword') ? nexusPassword : ''
+def nexusUser = project.hasProperty('nexusUsername') ? nexusUsername : 'admin'
+def nexusPw = project.hasProperty('nexusPassword') ? nexusPassword : 'admin123'
 
 uploadArchives {
     repositories {
