@@ -3,7 +3,7 @@ plugins {
 }
 
 apply plugin: 'java'
-apply plugin: 'maven-publish'
+apply plugin: 'maven'
 
 group = 'de.kgrupp'
 def isDebug = System.properties['inoks.java.monads.debug'] == "true"
@@ -13,6 +13,9 @@ version = isDebug || !versionStr ? "LOCAL-VERSION" : versionStr
 sourceCompatibility = 1.8
 
 repositories {
+    maven {
+        url "http://localhost:8081/repository/maven-public/"
+    }
     mavenCentral()
 }
 
@@ -37,41 +40,15 @@ task sourceJar(type: Jar) {
     classifier "sources"
 }
 
-publishing {
-    publications {
-        myPublication(MavenPublication) {
-            from components.java
-            artifact sourceJar
-            artifact ('README.md') {
-                classifier = 'README'
-                extension  = 'md'
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "${nexusUrl}/repository/maven-releases/") {
+                authentication(userName: nexusUsername, password: nexusPassword)
             }
-            pom {
-                name = "Inoks Java Monads"
-                description = "A set of java classes to enable monadic programming."
-                url = "https://github.com/inok1989/java-monads"
-                licenses {
-                    license {
-                        name = "MIT License"
-                        url = "https://opensource.org/licenses/mit-license"
-                    }
-                }
-                developers {
-                    developer {
-                        id = "inok1989"
-                        name = "Konstantin Grupp"
-                        email = "coding@konstantin-grupp.de"
-                    }
-                }
-                scm {
-                    connection = "scm:git:git:https://github.com/inok1989/java-monads.git"
-                    developerConnection = "scm:git:ssh://git@github.com/jenkinsci/jenkins.git"
-                    url = "https://github.com/inok1989/java-monads"
-                }
+            snapshotRepository(url: "${nexusUrl}/repository/maven-snapshots") {
+                authentication(userName: nexusUsername, password: nexusPassword)
             }
         }
-    }
-    repositories {
-        mavenLocal()
     }
 }
