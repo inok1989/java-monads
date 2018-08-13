@@ -4,17 +4,18 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static de.kgrupp.monads.result.AbstractResultExamples.EMPTY_SUCCESS;
 import static de.kgrupp.monads.result.AbstractResultExamples.ERROR_MESSAGE;
 import static de.kgrupp.monads.result.AbstractResultExamples.EXCEPTION;
-import static de.kgrupp.monads.result.AbstractResultExamples.RESULT_OBJECT;
-import static de.kgrupp.monads.result.AbstractResultExamples.SUCCESS_MESSAGE;
-import static de.kgrupp.monads.result.AbstractResultExamples.EMPTY_SUCCESS;
 import static de.kgrupp.monads.result.AbstractResultExamples.FAILURE;
 import static de.kgrupp.monads.result.AbstractResultExamples.INTERNAL_FAILURE;
+import static de.kgrupp.monads.result.AbstractResultExamples.RESULT_OBJECT;
 import static de.kgrupp.monads.result.AbstractResultExamples.SUCCESS;
+import static de.kgrupp.monads.result.AbstractResultExamples.SUCCESS_MESSAGE;
 import static de.kgrupp.monads.result.AbstractResultExamples.SUCCESS_WITH_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -166,5 +167,29 @@ class ResultBasicMethodTest {
     @Test
      void getElseThrowInternalFailure() {
         assertThrows(ResultException.class, INTERNAL_FAILURE::orElseThrow);
+    }
+
+    @Test
+    void equalsMethods() {
+        assertEquals(Result.of(RESULT_OBJECT), Result.of(RESULT_OBJECT));
+        assertNotEquals(Result.of(RESULT_OBJECT), Result.of(RESULT_OBJECT + "-NOT-EQUAL"));
+        assertEquals(Result.of(SUCCESS_MESSAGE, RESULT_OBJECT), Result.of(SUCCESS_MESSAGE, RESULT_OBJECT));
+        assertNotEquals(Result.of(SUCCESS_MESSAGE, RESULT_OBJECT), Result.of(SUCCESS_MESSAGE, RESULT_OBJECT + "-NOT-EQUAL"));
+        assertEquals(Result.fail(ERROR_MESSAGE), Result.fail(ERROR_MESSAGE));
+        assertNotEquals(Result.fail(ERROR_MESSAGE), Result.fail(ERROR_MESSAGE + "-NOT-EQUAL"));
+        assertEquals(Result.fail(EXCEPTION), Result.fail(EXCEPTION));
+        assertNotEquals(Result.fail(EXCEPTION), Result.fail(new RuntimeException(ERROR_MESSAGE)));
+    }
+
+    @Test
+    void hashCodeMethods() {
+        assertEquals(Result.of(RESULT_OBJECT).hashCode(), Result.of(RESULT_OBJECT).hashCode());
+        assertNotEquals(Result.of(RESULT_OBJECT).hashCode(), Result.of(RESULT_OBJECT + "-NOT-EQUAL").hashCode());
+        assertEquals(Result.of(SUCCESS_MESSAGE, RESULT_OBJECT).hashCode(), Result.of(SUCCESS_MESSAGE, RESULT_OBJECT).hashCode());
+        assertNotEquals(Result.of(SUCCESS_MESSAGE, RESULT_OBJECT).hashCode(), Result.of(SUCCESS_MESSAGE, RESULT_OBJECT + "-NOT-EQUAL").hashCode());
+        assertEquals(Result.fail(ERROR_MESSAGE).hashCode(), Result.fail(ERROR_MESSAGE).hashCode());
+        assertNotEquals(Result.fail(ERROR_MESSAGE).hashCode(), Result.fail(ERROR_MESSAGE + "-NOT-EQUAL").hashCode());
+        assertEquals(Result.fail(EXCEPTION).hashCode(), Result.fail(EXCEPTION).hashCode());
+        assertNotEquals(Result.fail(EXCEPTION).hashCode(), Result.fail(new RuntimeException(ERROR_MESSAGE)).hashCode());
     }
 }
