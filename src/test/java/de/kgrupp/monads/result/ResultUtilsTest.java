@@ -18,41 +18,41 @@ class ResultUtilsTest {
 
     @Test
     void testCombine() {
-        final Result<String> result = ResultUtils.combine(LIST, "", String::concat);
+        final Result<String> result = ResultUtils.flatCombine(LIST, "", String::concat);
         assertTrue(result.isSuccess());
         assertEquals("AB", result.getObject());
     }
 
     @Test
     void testCombineBasic() {
-        final Result<Stream<String>> result = ResultUtils.combine(LIST);
+        final Result<Stream<String>> result = ResultUtils.flatCombine(LIST);
         assertTrue(result.isSuccess());
         assertEquals(Optional.of("B"), result.getObject().skip(1).findFirst());
     }
 
     @Test
     void testCombineEmpty() {
-        final Result<String> result = ResultUtils.combine(Collections.emptyList(), "", String::concat);
+        final Result<String> result = ResultUtils.flatCombine(Collections.emptyList(), "", String::concat);
         assertTrue(result.isSuccess());
         assertEquals("", result.getObject());
     }
 
     @Test
     void testCombineError() {
-        Result<String> result = ResultUtils.combine(LIST_WITH_ERRORS, "", String::concat);
+        Result<String> result = ResultUtils.flatCombine(LIST_WITH_ERRORS, "", String::concat);
         assertTrue(result.isError());
     }
 
     @Test
     void testCombineStream() {
-        final Result<String> result = ResultUtils.combine(LIST.stream(), "", String::concat);
+        final Result<String> result = ResultUtils.flatCombine(LIST.stream(), "", String::concat);
         assertTrue(result.isSuccess());
         assertEquals("AB", result.getObject());
     }
 
     @Test
     void testCombineStreamBasic() {
-        final Result<Stream<String>> result = ResultUtils.combine(LIST.stream());
+        final Result<Stream<String>> result = ResultUtils.flatCombine(LIST.stream());
         assertTrue(result.isSuccess());
         assertEquals(Optional.of("B"), result.getObject().skip(1).findFirst());
     }
