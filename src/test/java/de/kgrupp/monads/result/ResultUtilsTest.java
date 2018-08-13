@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,6 +21,13 @@ class ResultUtilsTest {
         final Result<String> result = ResultUtils.combine(LIST, "", String::concat);
         assertTrue(result.isSuccess());
         assertEquals("AB", result.getObject());
+    }
+
+    @Test
+    void testCombineBasic() {
+        final Result<Stream<String>> result = ResultUtils.combine(LIST);
+        assertTrue(result.isSuccess());
+        assertEquals(Optional.of("B"), result.getObject().skip(1).findFirst());
     }
 
     @Test
@@ -39,5 +48,12 @@ class ResultUtilsTest {
         final Result<String> result = ResultUtils.combine(LIST.stream(), "", String::concat);
         assertTrue(result.isSuccess());
         assertEquals("AB", result.getObject());
+    }
+
+    @Test
+    void testCombineStreamBasic() {
+        final Result<Stream<String>> result = ResultUtils.combine(LIST.stream());
+        assertTrue(result.isSuccess());
+        assertEquals(Optional.of("B"), result.getObject().skip(1).findFirst());
     }
 }
