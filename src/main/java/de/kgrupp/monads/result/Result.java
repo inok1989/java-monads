@@ -1,6 +1,7 @@
 package de.kgrupp.monads.result;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -116,6 +117,20 @@ public interface Result<T> {
             return getObject();
         } else {
             throw new ResultException(getErrorMessage());
+        }
+    }
+
+    default void consume(Consumer<T> consumer) {
+        if (isSuccess()) {
+            consumer.accept(getObject());
+        }
+    }
+
+    default void consumeOrFail(Consumer<T> consumer) {
+        if (isSuccess()) {
+            consumer.accept(getObject());
+        } else {
+            throw new ResultException("Result is not a Success");
         }
     }
 }

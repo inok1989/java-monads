@@ -9,6 +9,7 @@ import static de.kgrupp.monads.result.AbstractResultExamples.FAILURE;
 import static de.kgrupp.monads.result.AbstractResultExamples.INTERNAL_FAILURE;
 import static de.kgrupp.monads.result.AbstractResultExamples.SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ResultHigherOrderTest {
@@ -67,6 +68,38 @@ class ResultHigherOrderTest {
     void testFilterToError() {
         Result<String> result = SUCCESS.filter(str -> false, ERROR_MESSAGE);
         assertTrue(result.isError());
+    }
+
+    class ExecuteState {
+        boolean executed = false;
+    }
+
+    @Test
+    void testConsume() {
+        ExecuteState state = new ExecuteState();
+        SUCCESS.consume(str -> state.executed = true);
+        assertTrue(state.executed);
+    }
+
+    @Test
+    void testConsumeOnError() {
+        ExecuteState state = new ExecuteState();
+        FAILURE.consume(str -> state.executed = true);
+        assertFalse(state.executed);
+    }
+
+    @Test
+    void testConsumeOrFail() {
+        ExecuteState state = new ExecuteState();
+        SUCCESS.consumeOrFail(str -> state.executed = true);
+        assertTrue(state.executed);
+    }
+
+    @Test
+    void testConsumeOrFailOnError() {
+        ExecuteState state = new ExecuteState();
+        assertThrows(ResultException.class, () -> FAILURE.consumeOrFail(str -> state.executed = true));
+        assertFalse(state.executed);
     }
 
 }
