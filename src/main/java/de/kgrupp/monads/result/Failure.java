@@ -34,11 +34,6 @@ public class Failure<T> implements Result<T> {
     }
 
     @Override
-    public String getSuccessMessage() {
-        throw new UnsupportedOperationException(Helper.THIS_METHOD_IS_NOT_SUPPORTED);
-    }
-
-    @Override
     public String getErrorMessage() {
         return errorMessage;
     }

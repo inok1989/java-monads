@@ -7,11 +7,9 @@ import java.util.Objects;
  */
 public class Success<T> implements Result<T> {
 
-    private final String successMessage;
     private final T object;
 
-    Success(String successMessage, T object) {
-        this.successMessage = successMessage;
+    Success(T object) {
         this.object = object;
     }
 
@@ -36,11 +34,6 @@ public class Success<T> implements Result<T> {
     }
 
     @Override
-    public String getSuccessMessage() {
-        return successMessage;
-    }
-
-    @Override
     public String getErrorMessage() {
         throw new UnsupportedOperationException(Helper.THIS_METHOD_IS_NOT_SUPPORTED);
     }
@@ -55,12 +48,11 @@ public class Success<T> implements Result<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Success<?> success = (Success<?>) o;
-        return Objects.equals(successMessage, success.successMessage) &&
-                Objects.equals(object, success.object);
+        return Objects.equals(object, success.object);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(successMessage, object);
+        return Objects.hash(object);
     }
 }

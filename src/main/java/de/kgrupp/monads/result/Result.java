@@ -11,7 +11,6 @@ import java.util.function.Supplier;
  */
 public interface Result<T> {
 
-    String SUCCESS = "SUCCESS";
     String INTERNAL_FAILURE = "INTERNAL_FAILURE";
 
     boolean isError();
@@ -30,22 +29,16 @@ public interface Result<T> {
         }
     }
 
-    String getSuccessMessage();
-
     String getErrorMessage();
 
     Throwable getThrowable();
 
     static <T> Result<T> of(T result) {
-        return new Success<>(SUCCESS, result);
+        return new Success<>(result);
     }
 
-    static Result<Void> emptySuccess(String successMessage) {
-        return new Success<>(successMessage, null);
-    }
-
-    static <T> Result<T> of(String successMessage, T result) {
-        return new Success<>(successMessage, result);
+    static Result<Void> emptySuccess() {
+        return new Success<>(null);
     }
 
     // this is intended here to convert Optionals
