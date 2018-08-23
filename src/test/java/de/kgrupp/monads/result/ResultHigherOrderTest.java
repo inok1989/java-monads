@@ -7,7 +7,9 @@ import java.util.function.Function;
 import static de.kgrupp.monads.result.AbstractResultExamples.ERROR_MESSAGE;
 import static de.kgrupp.monads.result.AbstractResultExamples.FAILURE;
 import static de.kgrupp.monads.result.AbstractResultExamples.INTERNAL_FAILURE;
+import static de.kgrupp.monads.result.AbstractResultExamples.RESULT_OBJECT;
 import static de.kgrupp.monads.result.AbstractResultExamples.SUCCESS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -100,6 +102,42 @@ class ResultHigherOrderTest {
         ExecuteState state = new ExecuteState();
         assertThrows(ResultException.class, () -> FAILURE.consumeOrFail(str -> state.executed = true));
         assertFalse(state.executed);
+    }
+
+    @Test
+    void testFlatRecoverSuccess() {
+        Result<String> result = SUCCESS.flatRecover(failure -> null);
+        assertEquals(SUCCESS, result);
+    }
+
+    @Test
+    void testFlatRecoverError() {
+        Result<String> result = FAILURE.flatRecover(failure -> SUCCESS);
+        assertEquals(SUCCESS, result);
+    }
+
+    @Test
+    void testFlatRecoverInternalFailure() {
+        Result<String> result = INTERNAL_FAILURE.flatRecover(failure -> SUCCESS);
+        assertEquals(SUCCESS, result);
+    }
+
+    @Test
+    void testFlatRecoverErrorFails() {
+        Result<String> result = FAILURE.flatRecover(failure -> INTERNAL_FAILURE);
+        assertEquals(INTERNAL_FAILURE, result);
+    }
+
+    @Test
+    void testRecoverSuccess() {
+        Result<String> result = SUCCESS.recover(failure -> null);
+        assertEquals(SUCCESS, result);
+    }
+
+    @Test
+    void testRecoverError() {
+        Result<String> result = FAILURE.recover(failure -> RESULT_OBJECT);
+        assertEquals(SUCCESS, result);
     }
 
 }

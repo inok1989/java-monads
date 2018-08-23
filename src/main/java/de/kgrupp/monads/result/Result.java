@@ -64,11 +64,7 @@ public interface Result<T> {
     }
 
     default <U> Result<U> map(Function<? super T, U> mapper) {
-        if (isSuccess()) {
-            return Result.of(mapper.apply(getObject()));
-        } else {
-            return Helper.transform(this);
-        }
+        return flatMap(obj -> Result.of(mapper.apply(getObject())));
     }
 
     default <U> Result<U> flatMap(Function<? super T, Result<U>> mapper) {
@@ -125,5 +121,17 @@ public interface Result<T> {
         } else {
             throw new ResultException("Result is not a Success");
         }
+    }
+
+    default Result<T> flatRecover(Function<Failure<T>, Result<T>> transformer) {
+        if (isError()) {
+            return transformer.apply((Failure<T>) this);
+        } else {
+            return this;
+        }
+    }
+
+    default Result<T> recover(Function<Failure<T>, T> transformer) {
+        return flatRecover(failure -> Result.of(transformer.apply(failure)));
     }
 }
