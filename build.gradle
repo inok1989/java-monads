@@ -1,9 +1,18 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+    }
+}
+
 plugins {
     id "org.sonarqube" version "2.6.2"
 }
 
 apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'com.bmuschko.nexus'
 
 group = 'de.kgrupp'
 def isDebug = System.properties['inoks.java.monads.debug'] == "true"
@@ -13,9 +22,6 @@ version = isDebug || !versionStr ? "LOCAL-VERSION" : versionStr
 sourceCompatibility = 1.8
 
 repositories {
-    maven {
-        url "http://localhost:8081/repository/maven-public/"
-    }
     mavenCentral()
 }
 
@@ -35,25 +41,45 @@ sonarqube {
     }
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-    classifier "sources"
-}
+modifyPom {
+    project {
+        name 'inoks-java-monads'
+        description 'Utility classes for developing with monads. '
+        url 'https://github.com/kgrupp/inoks-java-monads'
+        inceptionYear '2017'
 
-def nexusUrlRelease = project.hasProperty('nexusUrlRelease') ? nexusUrlRelease : 'http://localhost:8081/repository/maven-releases/'
-def nexusUrlSnapshot = project.hasProperty('nexusUrlSnapshot') ? nexusUrlSnapshot : 'http://localhost:8081/repository/maven-snapshots'
-def nexusUser = project.hasProperty('nexusUsername') ? nexusUsername : 'admin'
-def nexusPw = project.hasProperty('nexusPassword') ? nexusPassword : 'admin123'
+        scm {
+            url 'https://github.com/kgrupp/inoks-java-monads'
+            connection 'scm:https://kgrupp@github.com/kgrupp/inoks-java-monads.git'
+            developerConnection 'scm:git://github.com/kgrupp/inoks-java-monads.git'
+        }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: nexusUrlRelease) {
-                authentication(userName: nexusUser, password: nexusPw)
+        licenses {
+            license {
+                name 'MIT License'
+                url 'https://github.com/kgrupp/inoks-java-monads/blob/master/LICENSE'
+                distribution 'repo'
             }
-            snapshotRepository(url: nexusUrlSnapshot) {
-                authentication(userName: nexusUser, password: nexusPw)
+        }
+
+        developers {
+            developer {
+                id 'kgrupp'
+                name 'Konstantin Grupp'
+                email 'coding@konstantin-grupp.de'
             }
         }
     }
+}
+
+extraArchive {
+    sources = true
+    tests = true
+    javadoc = true
+}
+
+nexus {
+    sign = true
+    repositoryUrl = project.hasProperty('nexusUrlRelease') ? nexusUrlRelease : 'http://localhost:8081/repository/maven-releases/'
+    snapshotRepositoryUrl = project.hasProperty('nexusUrlSnapshot') ? nexusUrlSnapshot : 'http://localhost:8081/repository/maven-snapshots'
 }
