@@ -17,13 +17,17 @@ node {
         }
         stage('Archive') {
             archiveArtifacts artifacts: 'build/**/*.jar'
-            withCredentials([usernamePassword(credentialsId: 'nexus', passwordVariable: 'nexusPassword', usernameVariable: 'nexusUsername')]) {
-                bat "gradlew.bat --info upload -Dinoks.java.monads.version=${version} -PnexusUsername=${nexusUsername} -PnexusPassword=${nexusPassword}"
-            }
-            withCredentials([usernamePassword(credentialsId: 'oss.sonartype.org', passwordVariable: 'nexusPassword', usernameVariable: 'nexusUsername')]) {
-                def nexusUrlRelease = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-                def nexusUrlSnapshot = "https://oss.sonatype.org/content/repositories/snapshots"
-                bat "gradlew.bat --info upload -Dinoks.java.monads.version=${version} -PnexusUsername=${nexusUsername} -PnexusPassword=${nexusPassword} -PnexusUrlRelease=${nexusUrlRelease} -PnexusUrlSnapshot=${nexusUrlSnapshot}"
+            withCredentials([file(credentialsId: 'gpg-signed', variable: 'gradleProperties')]) {
+                def fileContent = readFile gradleProperties
+                writeFile file: 'gradle.properties', text: fileContent
+                withCredentials([usernamePassword(credentialsId: 'nexus', passwordVariable: 'nexusPassword', usernameVariable: 'nexusUsername')]) {
+                    bat "gradlew.bat --info upload -Dinoks.java.monads.version=${version} -PnexusUsername=${nexusUsername} -PnexusPassword=${nexusPassword}"
+                }
+                withCredentials([usernamePassword(credentialsId: 'oss.sonartype.org', passwordVariable: 'nexusPassword', usernameVariable: 'nexusUsername')]) {
+                    def nexusUrlRelease = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                    def nexusUrlSnapshot = "https://oss.sonatype.org/content/repositories/snapshots"
+                    bat "gradlew.bat --info upload -Dinoks.java.monads.version=${version} -PnexusUsername=${nexusUsername} -PnexusPassword=${nexusPassword} -PnexusUrlRelease=${nexusUrlRelease} -PnexusUrlSnapshot=${nexusUrlSnapshot}"
+                }
             }
         }
     } catch (Throwable t) {
