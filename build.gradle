@@ -86,3 +86,10 @@ nexus {
     repositoryUrl = project.hasProperty('nexusUrlRelease') ? nexusUrlRelease : 'http://localhost:8081/repository/maven-releases/'
     snapshotRepositoryUrl = project.hasProperty('nexusUrlSnapshot') ? nexusUrlSnapshot : 'http://localhost:8081/repository/maven-snapshots'
 }
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
+}
