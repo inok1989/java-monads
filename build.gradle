@@ -4,6 +4,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
     }
 }
 
@@ -13,6 +14,8 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'com.bmuschko.nexus'
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'jacoco'
 
 group = 'de.kgrupp'
 def isDebug = System.properties['inoks.java.monads.debug'] == "true"
