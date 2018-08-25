@@ -2,8 +2,16 @@ language: java
 jdk:
 - oraclejdk8
 
+addons:
+  sonarcloud:
+    organization: "kgrupp-github"
+    token:
+      secure: "Z1+MnqodrO/aSih9Ot+mt2oU1yam7tnDqXzinNcex4mBQJkk9a1TBGRg7ZJaTf57QdV+8PGnl8w42XcAeU8ERCoVSdX3oXySCZTuO3lGEbFWO9uK3pgjjcQdclwWpUEIJi1Zp2zvsV2BqJJ+nWOopp+OS+yeY8etviUNczZ1MHH9MEP17aYs4c35wNv2KGCK7h7mFN0dlPqhCt2kuz0HPaL1bJt1TYPNmYKiPa/MvnSgKs/B9KEG9m6tgaeFL9UPhGjk2VYPUuhMcYuIkOfmsR2RxVMgbZUZ3Zfn+TNyazmkmpp8X1VTGphA18EdiKLXzpMoeBYOe5/J+S7jsrbolM/tuHBW2Ma4yXmW+0FWIpCqoN7LMfK+MiHWDl23RFSBRMy++4r5m0KA7zuGHTaTEeODy5uiYhT0+n8igsXKQSCVPF1WR2L2C8koLzierG/KoUJNbPlaCLaR/TTzalodB3a50A5fe/3Q/P9AalgkAfecVQ/luevuJGwOjR6vAxPqTLIWP3D684iEmL+/uWyF9pWmNUK/thcAxRbTCX/HFhZVqXp0opp2XArX+ggBelveoR69IdtPfjtNb8Wp8+W8hIo7ZgWcS9Qdg+wz61QGFPXP4t/RCpwBtyQKhX1X7xSYt3b6ey0gNxz09BwQPnM6BCGeozlphFDaUO3DOgVjYAI="
+
+
 before_install:
 - chmod +x gradlew
 
 after_success:
 - ./gradlew jacocoTestReport coveralls
+- ./gradlew sonarqube
