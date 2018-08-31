@@ -27,4 +27,10 @@ class HelperTest {
         assertTrue(result.isError());
         assertTrue(result.isInternalError());
     }
+
+    @Test
+    void testToExceptionSuccess() {
+        // not possible for success
+        assertThrows(IllegalArgumentException.class, () -> Helper.toException(AbstractResultExamples.SUCCESS));
+    }
 }

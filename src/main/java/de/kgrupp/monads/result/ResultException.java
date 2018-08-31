@@ -8,4 +8,8 @@ public class ResultException extends RuntimeException {
     ResultException(String message) {
         super(message);
     }
+
+    ResultException(Throwable throwable) {
+        super(throwable);
+    }
 }

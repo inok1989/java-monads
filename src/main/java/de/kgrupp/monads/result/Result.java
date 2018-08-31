@@ -101,11 +101,19 @@ public interface Result<T> {
         }
     }
 
+    default T orElseThrow(Function<Failure<T>, RuntimeException> transformer) {
+        if (isSuccess()) {
+            return getObject();
+        } else {
+            throw transformer.apply((Failure<T>) this);
+        }
+    }
+
     default T orElseThrow() {
         if (isSuccess()) {
             return getObject();
         } else {
-            throw new ResultException(getErrorMessage());
+            throw Helper.toException(this);
         }
     }
 
@@ -119,7 +127,7 @@ public interface Result<T> {
         if (isSuccess()) {
             consumer.accept(getObject());
         } else {
-            throw new ResultException("Result is not a Success");
+            throw Helper.toException(this);
         }
     }
 

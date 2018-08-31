@@ -9,11 +9,15 @@ import static de.kgrupp.monads.result.AbstractResultExamples.ERROR_MESSAGE;
 import static de.kgrupp.monads.result.AbstractResultExamples.EXCEPTION;
 import static de.kgrupp.monads.result.AbstractResultExamples.FAILURE;
 import static de.kgrupp.monads.result.AbstractResultExamples.INTERNAL_FAILURE;
+import static de.kgrupp.monads.result.AbstractResultExamples.NOT_VALID;
 import static de.kgrupp.monads.result.AbstractResultExamples.RESULT_OBJECT;
 import static de.kgrupp.monads.result.AbstractResultExamples.SUCCESS;
+import static de.kgrupp.monads.result.Result.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -143,31 +147,57 @@ class ResultBasicMethodTest {
 
     @Test
     void getElseThrowFailure() {
-        assertThrows(ResultException.class, FAILURE::orElseThrow);
+        ResultException resultException = assertThrows(ResultException.class, FAILURE::orElseThrow);
+        assertNull(resultException.getCause());
     }
 
     @Test
     void getElseThrowInternalFailure() {
-        assertThrows(ResultException.class, INTERNAL_FAILURE::orElseThrow);
+        ResultException resultException = assertThrows(ResultException.class, INTERNAL_FAILURE::orElseThrow);
+        assertNotNull(resultException.getCause());
+    }
+
+    @Test
+    void getElseThrowSupplier() {
+        assertEquals(RESULT_OBJECT, SUCCESS.orElseThrow(success -> {
+            fail("This should not be called");
+            return null;
+        }));
+    }
+
+    @Test
+    void getElseThrowSupplierFailure() {
+        IllegalArgumentException resultException = assertThrows(IllegalArgumentException.class,
+                () -> FAILURE.orElseThrow(failure -> new IllegalArgumentException(NOT_VALID)));
+        assertEquals(NOT_VALID, resultException.getMessage());
+        assertNull(resultException.getCause());
+    }
+
+    @Test
+    void getElseThrowSupplierInternalFailure() {
+        IllegalArgumentException resultException = assertThrows(IllegalArgumentException.class,
+                () -> INTERNAL_FAILURE.orElseThrow(failure -> new IllegalArgumentException(NOT_VALID, failure.getThrowable())));
+        assertEquals(NOT_VALID, resultException.getMessage());
+        assertNotNull(resultException.getCause());
     }
 
     @Test
     void equalsMethods() {
         assertEquals(Result.of(RESULT_OBJECT), Result.of(RESULT_OBJECT));
         assertNotEquals(Result.of(RESULT_OBJECT), Result.of(RESULT_OBJECT + "-NOT-EQUAL"));
-        assertEquals(Result.fail(ERROR_MESSAGE), Result.fail(ERROR_MESSAGE));
-        assertNotEquals(Result.fail(ERROR_MESSAGE), Result.fail(ERROR_MESSAGE + "-NOT-EQUAL"));
-        assertEquals(Result.fail(EXCEPTION), Result.fail(EXCEPTION));
-        assertNotEquals(Result.fail(EXCEPTION), Result.fail(new RuntimeException(ERROR_MESSAGE)));
+        assertEquals(fail(ERROR_MESSAGE), fail(ERROR_MESSAGE));
+        assertNotEquals(fail(ERROR_MESSAGE), fail(ERROR_MESSAGE + "-NOT-EQUAL"));
+        assertEquals(fail(EXCEPTION), fail(EXCEPTION));
+        assertNotEquals(fail(EXCEPTION), fail(new RuntimeException(ERROR_MESSAGE)));
     }
 
     @Test
     void hashCodeMethods() {
         assertEquals(Result.of(RESULT_OBJECT).hashCode(), Result.of(RESULT_OBJECT).hashCode());
         assertNotEquals(Result.of(RESULT_OBJECT).hashCode(), Result.of(RESULT_OBJECT + "-NOT-EQUAL").hashCode());
-        assertEquals(Result.fail(ERROR_MESSAGE).hashCode(), Result.fail(ERROR_MESSAGE).hashCode());
-        assertNotEquals(Result.fail(ERROR_MESSAGE).hashCode(), Result.fail(ERROR_MESSAGE + "-NOT-EQUAL").hashCode());
-        assertEquals(Result.fail(EXCEPTION).hashCode(), Result.fail(EXCEPTION).hashCode());
-        assertNotEquals(Result.fail(EXCEPTION).hashCode(), Result.fail(new RuntimeException(ERROR_MESSAGE)).hashCode());
+        assertEquals(fail(ERROR_MESSAGE).hashCode(), fail(ERROR_MESSAGE).hashCode());
+        assertNotEquals(fail(ERROR_MESSAGE).hashCode(), fail(ERROR_MESSAGE + "-NOT-EQUAL").hashCode());
+        assertEquals(fail(EXCEPTION).hashCode(), fail(EXCEPTION).hashCode());
+        assertNotEquals(fail(EXCEPTION).hashCode(), fail(new RuntimeException(ERROR_MESSAGE)).hashCode());
     }
 }

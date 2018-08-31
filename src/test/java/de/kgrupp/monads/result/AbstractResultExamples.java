@@ -8,6 +8,7 @@ final class AbstractResultExamples {
 
     static final String ERROR_MESSAGE = "We failed";
     static final String RESULT_OBJECT = "This is our result";
+    static final String NOT_VALID = "Not valid";
     static final Throwable EXCEPTION = new RuntimeException(ERROR_MESSAGE);
 
     static final Result<String> FAILURE = Result.fail(ERROR_MESSAGE);
