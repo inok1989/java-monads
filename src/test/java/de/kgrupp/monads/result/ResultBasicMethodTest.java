@@ -1,5 +1,6 @@
 package de.kgrupp.monads.result;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -12,7 +13,6 @@ import static de.kgrupp.monads.result.AbstractResultExamples.INTERNAL_FAILURE;
 import static de.kgrupp.monads.result.AbstractResultExamples.NOT_VALID;
 import static de.kgrupp.monads.result.AbstractResultExamples.RESULT_OBJECT;
 import static de.kgrupp.monads.result.AbstractResultExamples.SUCCESS;
-import static de.kgrupp.monads.result.Result.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -23,181 +23,342 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ResultBasicMethodTest {
 
-    @Test
-    void testIsError() {
-        assertTrue(FAILURE.isError());
-        assertTrue(INTERNAL_FAILURE.isError());
-        assertFalse(SUCCESS.isError());
-        assertFalse(EMPTY_SUCCESS.isError());
+    @Nested
+    class IsError {
+
+        @Test
+        void failure() {
+            assertTrue(FAILURE.isError());
+        }
+
+        @Test
+        void internalFailure() {
+            assertTrue(INTERNAL_FAILURE.isError());
+        }
+
+        @Test
+        void success() {
+            assertFalse(SUCCESS.isError());
+        }
+
+        @Test
+        void emptySuccess() {
+            assertFalse(EMPTY_SUCCESS.isError());
+        }
+
     }
 
-    @Test
-    void testIsInternalError() {
-        assertFalse(FAILURE.isInternalError());
-        assertTrue(INTERNAL_FAILURE.isInternalError());
-        assertFalse(SUCCESS.isInternalError());
-        assertFalse(EMPTY_SUCCESS.isInternalError());
+    @Nested
+    class IsInternalError {
+
+        @Test
+        void failure() {
+            assertFalse(FAILURE.isInternalError());
+        }
+
+        @Test
+        void internalFailure() {
+            assertTrue(INTERNAL_FAILURE.isInternalError());
+        }
+
+        @Test
+        void success() {
+            assertFalse(SUCCESS.isInternalError());
+        }
+
+        @Test
+        void emptySuccess() {
+            assertFalse(EMPTY_SUCCESS.isInternalError());
+        }
+
     }
 
-    @Test
-    void testIsSuccess() {
-        assertFalse(FAILURE.isSuccess());
-        assertFalse(INTERNAL_FAILURE.isSuccess());
-        assertTrue(SUCCESS.isSuccess());
-        assertTrue(EMPTY_SUCCESS.isSuccess());
+    @Nested
+    class IsSuccess {
+
+        @Test
+        void failure() {
+            assertFalse(FAILURE.isSuccess());
+        }
+
+        @Test
+        void internalFailure() {
+            assertFalse(INTERNAL_FAILURE.isSuccess());
+        }
+
+        @Test
+        void success() {
+            assertTrue(SUCCESS.isSuccess());
+        }
+
+        @Test
+        void emptySuccess() {
+            assertTrue(EMPTY_SUCCESS.isSuccess());
+        }
     }
 
-    @Test
-    void testGetObjectFailsOnFailure() {
-        assertThrows(UnsupportedOperationException.class, FAILURE::getObject);
+    @Nested
+    class GetObject {
+        @Test
+        void failsOnFailure() {
+            assertThrows(UnsupportedOperationException.class, FAILURE::getObject);
+        }
+
+        @Test
+        void failsOnInternalFailure() {
+            assertThrows(UnsupportedOperationException.class, INTERNAL_FAILURE::getObject);
+        }
     }
 
-    @Test
-    void testGetObjectFailsOnInternalFailure() {
-        assertThrows(UnsupportedOperationException.class, INTERNAL_FAILURE::getObject);
+    @Nested
+    class AsOptional {
+        @Test
+        void failure() {
+            assertFalse(FAILURE.asOptional().isPresent());
+        }
+
+        @Test
+        void internalFailure() {
+            assertFalse(INTERNAL_FAILURE.asOptional().isPresent());
+        }
+
+        @Test
+        void success() {
+            assertTrue(SUCCESS.asOptional().isPresent());
+        }
+
+        @Test
+        void emptySuccess() {
+            assertFalse(EMPTY_SUCCESS.asOptional().isPresent());
+        }
     }
 
-    @Test
-    void testAsOptional() {
-        assertFalse(FAILURE.asOptional().isPresent());
-        assertFalse(INTERNAL_FAILURE.asOptional().isPresent());
-        assertTrue(SUCCESS.asOptional().isPresent());
-        assertFalse(EMPTY_SUCCESS.asOptional().isPresent());
+    @Nested
+    class GetErrorMessage {
+        @Test
+        void failure() {
+            assertEquals(ERROR_MESSAGE, FAILURE.getErrorMessage());
+        }
+
+        @Test
+        void internalFailure() {
+            assertEquals(Result.INTERNAL_FAILURE, INTERNAL_FAILURE.getErrorMessage());
+        }
+
+        @Test
+        void successFails() {
+            assertThrows(UnsupportedOperationException.class, SUCCESS::getErrorMessage);
+        }
     }
 
-    @Test
-    void testGetErrorMessage() {
-        assertEquals(ERROR_MESSAGE, FAILURE.getErrorMessage());
-        assertEquals(Result.INTERNAL_FAILURE, INTERNAL_FAILURE.getErrorMessage());
+    @Nested
+    class GetThrowable {
+
+        @Test
+        void internalFailure() {
+            assertEquals(EXCEPTION, INTERNAL_FAILURE.getThrowable());
+        }
+
+        @Test
+        void successFails() {
+            assertThrows(UnsupportedOperationException.class, EMPTY_SUCCESS::getThrowable);
+        }
+
+        @Test
+        void failureFails() {
+            assertThrows(UnsupportedOperationException.class, FAILURE::getThrowable);
+        }
+
     }
 
-    @Test
-    void testGetErrorMessageFails() {
-        assertThrows(UnsupportedOperationException.class, SUCCESS::getErrorMessage);
+    @Nested
+    class OfOptional {
+        @Test
+        void success() {
+            Result<String> result = Result.of(Optional.of(RESULT_OBJECT), ERROR_MESSAGE);
+            assertTrue(result.isSuccess());
+            assertEquals(RESULT_OBJECT, result.getObject());
+        }
+
+        @Test
+        void failure() {
+            Result<String> result = Result.of(Optional.empty(), ERROR_MESSAGE);
+            assertTrue(result.isError());
+            assertFalse(result.isInternalError());
+        }
+
+        @Test
+        void internalFailure() {
+            Result<String> result = Result.of(Optional.empty(), () -> EXCEPTION);
+            assertTrue(result.isError());
+            assertTrue(result.isInternalError());
+        }
     }
 
-    @Test
-    void testGetThrowable() {
-        assertEquals(EXCEPTION, INTERNAL_FAILURE.getThrowable());
+    @Nested
+    class OfNullable {
+        @Test
+        void success() {
+            Result<String> result = Result.ofNullable(RESULT_OBJECT, ERROR_MESSAGE);
+            assertTrue(result.isSuccess());
+            assertEquals(RESULT_OBJECT, result.getObject());
+        }
+
+        @Test
+        void failure() {
+            Result<String> result = Result.ofNullable(null, ERROR_MESSAGE);
+            assertTrue(result.isError());
+            assertFalse(result.isInternalError());
+        }
     }
 
-    @Test
-    void testGetThrowableFailsForSuccess() {
-        assertThrows(UnsupportedOperationException.class, EMPTY_SUCCESS::getThrowable);
+    @Nested
+    class OrElse {
+        @Test
+        void success() {
+            assertEquals(RESULT_OBJECT, SUCCESS.orElse("OTHER"));
+        }
+
+        @Test
+        void failure() {
+            assertEquals(RESULT_OBJECT, FAILURE.orElse(RESULT_OBJECT));
+        }
+
+        @Test
+        void internalFailure() {
+            assertEquals(RESULT_OBJECT, INTERNAL_FAILURE.orElse(RESULT_OBJECT));
+        }
     }
 
-    @Test
-    void testGetThrowableFailsForFailure() {
-        assertThrows(UnsupportedOperationException.class, FAILURE::getThrowable);
+    @Nested
+    class OrElseGet {
+        @Test
+        void success() {
+            assertEquals(RESULT_OBJECT, SUCCESS.orElseGet(() -> "OTHER"));
+        }
+
+        @Test
+        void failure() {
+            assertEquals(RESULT_OBJECT, FAILURE.orElseGet(() -> RESULT_OBJECT));
+        }
+
+        @Test
+        void internalFailure() {
+            assertEquals(RESULT_OBJECT, INTERNAL_FAILURE.orElseGet(() -> RESULT_OBJECT));
+        }
     }
 
-    @Test
-    void testOfOptionalSuccess() {
-        Result<String> result = Result.of(Optional.of(RESULT_OBJECT), ERROR_MESSAGE);
-        assertTrue(result.isSuccess());
-        assertEquals(RESULT_OBJECT, result.getObject());
+    @Nested
+    class GetElseThrow {
+        @Test
+        void success() {
+            assertEquals(RESULT_OBJECT, SUCCESS.orElseThrow());
+        }
+
+        @Test
+        void failure() {
+            ResultException resultException = assertThrows(ResultException.class, FAILURE::orElseThrow);
+            assertNull(resultException.getCause());
+        }
+
+        @Test
+        void internalFailure() {
+            ResultException resultException = assertThrows(ResultException.class, INTERNAL_FAILURE::orElseThrow);
+            assertNotNull(resultException.getCause());
+        }
     }
 
-    @Test
-    void testOfOptionalError() {
-        Result<String> result = Result.of(Optional.empty(), ERROR_MESSAGE);
-        assertTrue(result.isError());
-        assertFalse(result.isInternalError());
+    @Nested
+    class GetElseThrowSupplier {
+
+        @Test
+        void success() {
+            assertEquals(RESULT_OBJECT, SUCCESS.orElseThrow(success -> {
+                Result.fail("This should not be called");
+                return null;
+            }));
+        }
+
+        @Test
+        void failure() {
+            IllegalArgumentException resultException = assertThrows(IllegalArgumentException.class,
+                    () -> FAILURE.orElseThrow(failure -> new IllegalArgumentException(NOT_VALID)));
+            assertEquals(NOT_VALID, resultException.getMessage());
+            assertNull(resultException.getCause());
+        }
+
+        @Test
+        void internalFailure() {
+            IllegalArgumentException resultException = assertThrows(IllegalArgumentException.class,
+                    () -> INTERNAL_FAILURE.orElseThrow(failure -> new IllegalArgumentException(NOT_VALID, failure.getThrowable())));
+            assertEquals(NOT_VALID, resultException.getMessage());
+            assertNotNull(resultException.getCause());
+        }
     }
 
-    @Test
-    void testOfOptionalInternalError() {
-        Result<String> result = Result.of(Optional.empty(), () -> EXCEPTION);
-        assertTrue(result.isError());
-        assertTrue(result.isInternalError());
+    @Nested
+    class Equals {
+        @Test
+        void success() {
+            assertEquals(Result.of(RESULT_OBJECT), Result.of(RESULT_OBJECT));
+        }
+
+        @Test
+        void successNotEqual() {
+            assertNotEquals(Result.of(RESULT_OBJECT), Result.of(RESULT_OBJECT + "-NOT-EQUAL"));
+        }
+
+        @Test
+        void failure() {
+            assertEquals(Result.fail(ERROR_MESSAGE), Result.fail(ERROR_MESSAGE));
+        }
+
+        @Test
+        void failureNotEqual() {
+            assertNotEquals(Result.fail(ERROR_MESSAGE), Result.fail(ERROR_MESSAGE + "-NOT-EQUAL"));
+        }
+
+        @Test
+        void internalFailure() {
+            assertEquals(Result.fail(EXCEPTION), Result.fail(EXCEPTION));
+        }
+
+        @Test
+        void internalFailureNotEqual() {
+            assertNotEquals(Result.fail(EXCEPTION), Result.fail(new RuntimeException(ERROR_MESSAGE)));
+        }
     }
 
-    @Test
-    void testOfNullableSuccess() {
-        Result<String> result = Result.ofNullable(RESULT_OBJECT, ERROR_MESSAGE);
-        assertTrue(result.isSuccess());
-        assertEquals(RESULT_OBJECT, result.getObject());
-    }
+    @Nested
+    class HashCode {
+        @Test
+        void success() {
+            assertEquals(Result.of(RESULT_OBJECT).hashCode(), Result.of(RESULT_OBJECT).hashCode());
+        }
 
-    @Test
-    void testOfNullableError() {
-        Result<String> result = Result.ofNullable(null, ERROR_MESSAGE);
-        assertTrue(result.isError());
-        assertFalse(result.isInternalError());
-    }
+        @Test
+        void successNotEqual() {
+            assertNotEquals(Result.of(RESULT_OBJECT).hashCode(), Result.of(RESULT_OBJECT + "-NOT-EQUAL").hashCode());
+        }
 
-    @Test
-    void testOrElse() {
-        assertEquals(RESULT_OBJECT, SUCCESS.orElse("OTHER"));
-        assertEquals(RESULT_OBJECT, FAILURE.orElse(RESULT_OBJECT));
-        assertEquals(RESULT_OBJECT, INTERNAL_FAILURE.orElse(RESULT_OBJECT));
-    }
+        @Test
+        void failure() {
+            assertEquals(Result.fail(ERROR_MESSAGE).hashCode(), Result.fail(ERROR_MESSAGE).hashCode());
+        }
 
-    @Test
-    void testOrElseGet() {
-        assertEquals(RESULT_OBJECT, SUCCESS.orElseGet(() -> "OTHER"));
-        assertEquals(RESULT_OBJECT, FAILURE.orElseGet(() -> RESULT_OBJECT));
-        assertEquals(RESULT_OBJECT, INTERNAL_FAILURE.orElseGet(() -> RESULT_OBJECT));
-    }
+        @Test
+        void failureNotEqual() {
+            assertNotEquals(Result.fail(ERROR_MESSAGE).hashCode(), Result.fail(ERROR_MESSAGE + "-NOT-EQUAL").hashCode());
+        }
 
-    @Test
-    void getElseThrow() {
-        assertEquals(RESULT_OBJECT, SUCCESS.orElseThrow());
-    }
+        @Test
+        void internalFailure() {
+            assertEquals(Result.fail(EXCEPTION).hashCode(), Result.fail(EXCEPTION).hashCode());
+        }
 
-    @Test
-    void getElseThrowFailure() {
-        ResultException resultException = assertThrows(ResultException.class, FAILURE::orElseThrow);
-        assertNull(resultException.getCause());
-    }
-
-    @Test
-    void getElseThrowInternalFailure() {
-        ResultException resultException = assertThrows(ResultException.class, INTERNAL_FAILURE::orElseThrow);
-        assertNotNull(resultException.getCause());
-    }
-
-    @Test
-    void getElseThrowSupplier() {
-        assertEquals(RESULT_OBJECT, SUCCESS.orElseThrow(success -> {
-            fail("This should not be called");
-            return null;
-        }));
-    }
-
-    @Test
-    void getElseThrowSupplierFailure() {
-        IllegalArgumentException resultException = assertThrows(IllegalArgumentException.class,
-                () -> FAILURE.orElseThrow(failure -> new IllegalArgumentException(NOT_VALID)));
-        assertEquals(NOT_VALID, resultException.getMessage());
-        assertNull(resultException.getCause());
-    }
-
-    @Test
-    void getElseThrowSupplierInternalFailure() {
-        IllegalArgumentException resultException = assertThrows(IllegalArgumentException.class,
-                () -> INTERNAL_FAILURE.orElseThrow(failure -> new IllegalArgumentException(NOT_VALID, failure.getThrowable())));
-        assertEquals(NOT_VALID, resultException.getMessage());
-        assertNotNull(resultException.getCause());
-    }
-
-    @Test
-    void equalsMethods() {
-        assertEquals(Result.of(RESULT_OBJECT), Result.of(RESULT_OBJECT));
-        assertNotEquals(Result.of(RESULT_OBJECT), Result.of(RESULT_OBJECT + "-NOT-EQUAL"));
-        assertEquals(fail(ERROR_MESSAGE), fail(ERROR_MESSAGE));
-        assertNotEquals(fail(ERROR_MESSAGE), fail(ERROR_MESSAGE + "-NOT-EQUAL"));
-        assertEquals(fail(EXCEPTION), fail(EXCEPTION));
-        assertNotEquals(fail(EXCEPTION), fail(new RuntimeException(ERROR_MESSAGE)));
-    }
-
-    @Test
-    void hashCodeMethods() {
-        assertEquals(Result.of(RESULT_OBJECT).hashCode(), Result.of(RESULT_OBJECT).hashCode());
-        assertNotEquals(Result.of(RESULT_OBJECT).hashCode(), Result.of(RESULT_OBJECT + "-NOT-EQUAL").hashCode());
-        assertEquals(fail(ERROR_MESSAGE).hashCode(), fail(ERROR_MESSAGE).hashCode());
-        assertNotEquals(fail(ERROR_MESSAGE).hashCode(), fail(ERROR_MESSAGE + "-NOT-EQUAL").hashCode());
-        assertEquals(fail(EXCEPTION).hashCode(), fail(EXCEPTION).hashCode());
-        assertNotEquals(fail(EXCEPTION).hashCode(), fail(new RuntimeException(ERROR_MESSAGE)).hashCode());
+        @Test
+        void internalFailureNotEqual() {
+            assertNotEquals(Result.fail(EXCEPTION).hashCode(), Result.fail(new RuntimeException(ERROR_MESSAGE)).hashCode());
+        }
     }
 }
