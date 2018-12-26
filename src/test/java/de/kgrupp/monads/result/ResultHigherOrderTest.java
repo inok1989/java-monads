@@ -140,4 +140,16 @@ class ResultHigherOrderTest {
         assertEquals(SUCCESS, result);
     }
 
+    @Test
+    void testFlatRunnableSuccess() {
+        Result<String> result = SUCCESS.flatRunnable(failure -> Result.emptySuccess());
+        assertEquals(SUCCESS, result);
+    }
+
+    @Test
+    void testFlatRunnableError() {
+        Result<String> result = FAILURE.flatRunnable(failure -> SUCCESS);
+        assertEquals(FAILURE, result);
+    }
+
 }

@@ -142,4 +142,12 @@ public interface Result<T> {
     default Result<T> recover(Function<Failure<T>, T> transformer) {
         return flatRecover(failure -> Result.of(transformer.apply(failure)));
     }
+
+    default <O> Result<T> flatRunnable(Function<T, Result<O>> runnable) {
+        if (isSuccess()) {
+            return runnable.apply(getObject()).map(obj -> getObject());
+        } else {
+            return this;
+        }
+    }
 }
