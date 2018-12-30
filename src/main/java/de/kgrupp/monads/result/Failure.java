@@ -55,4 +55,9 @@ public class Failure<T> implements Result<T> {
     public int hashCode() {
         return Objects.hash(errorMessage);
     }
+
+    @Override
+    public String toString() {
+        return "Failure{" + errorMessage + '}';
+    }
 }

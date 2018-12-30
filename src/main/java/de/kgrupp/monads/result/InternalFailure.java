@@ -37,4 +37,9 @@ public class InternalFailure<T> extends Failure<T> {
     public int hashCode() {
         return Objects.hash(super.hashCode(), throwable);
     }
+
+    @Override
+    public String toString() {
+        return "InternalFailure{" + throwable + '}';
+    }
 }

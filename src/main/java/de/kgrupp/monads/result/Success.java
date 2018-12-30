@@ -55,4 +55,9 @@ public class Success<T> implements Result<T> {
     public int hashCode() {
         return Objects.hash(object);
     }
+
+    @Override
+    public String toString() {
+        return "Success{" + object + '}';
+    }
 }
