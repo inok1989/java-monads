@@ -14,7 +14,7 @@ Since 0.7.0.1 supports only Java 11 and higher.
 Download from [Maven Central][maven] or depend via Gradle:
 
 ```gradle
-compile 'de.kgrupp:inoks-java-monads:0.7.0.1'
+implementation 'de.kgrupp:inoks-java-monads:0.7.1.1'
 ```
 
 Snapshots of the development version are available in [Sonatype's snapshots repository][snapshots].
