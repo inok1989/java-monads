@@ -9,6 +9,7 @@ import static de.kgrupp.monads.result.AbstractResultExamples.EMPTY_SUCCESS;
 import static de.kgrupp.monads.result.AbstractResultExamples.ERROR_MESSAGE;
 import static de.kgrupp.monads.result.AbstractResultExamples.EXCEPTION;
 import static de.kgrupp.monads.result.AbstractResultExamples.FAILURE;
+import static de.kgrupp.monads.result.AbstractResultExamples.INTERNAL_ERROR_MESSAGE;
 import static de.kgrupp.monads.result.AbstractResultExamples.INTERNAL_FAILURE;
 import static de.kgrupp.monads.result.AbstractResultExamples.NOT_VALID;
 import static de.kgrupp.monads.result.AbstractResultExamples.RESULT_OBJECT;
@@ -119,7 +120,7 @@ class ResultBasicMethodTest {
 
         @Test
         void internalFailure() {
-            assertFalse(INTERNAL_FAILURE.asOptional().isPresent());
+            assertThrows(ResultException.class, INTERNAL_FAILURE::asOptional);
         }
 
         @Test
@@ -142,7 +143,7 @@ class ResultBasicMethodTest {
 
         @Test
         void internalFailure() {
-            assertEquals(Result.INTERNAL_FAILURE, INTERNAL_FAILURE.getErrorMessage());
+            assertEquals(INTERNAL_ERROR_MESSAGE, INTERNAL_FAILURE.getErrorMessage());
         }
 
         @Test
@@ -152,21 +153,21 @@ class ResultBasicMethodTest {
     }
 
     @Nested
-    class GetThrowable {
+    class GetException {
 
         @Test
         void internalFailure() {
-            assertEquals(EXCEPTION, INTERNAL_FAILURE.getThrowable());
+            assertEquals(EXCEPTION, INTERNAL_FAILURE.getException());
         }
 
         @Test
         void successFails() {
-            assertThrows(UnsupportedOperationException.class, EMPTY_SUCCESS::getThrowable);
+            assertThrows(UnsupportedOperationException.class, EMPTY_SUCCESS::getException);
         }
 
         @Test
         void failureFails() {
-            assertThrows(UnsupportedOperationException.class, FAILURE::getThrowable);
+            assertThrows(UnsupportedOperationException.class, FAILURE::getException);
         }
 
     }
@@ -290,7 +291,7 @@ class ResultBasicMethodTest {
         @Test
         void internalFailure() {
             IllegalArgumentException resultException = assertThrows(IllegalArgumentException.class,
-                    () -> INTERNAL_FAILURE.orElseThrow(failure -> new IllegalArgumentException(NOT_VALID, failure.getThrowable())));
+                    () -> INTERNAL_FAILURE.orElseThrow(failure -> new IllegalArgumentException(NOT_VALID, failure.getException())));
             assertEquals(NOT_VALID, resultException.getMessage());
             assertNotNull(resultException.getCause());
         }
@@ -320,12 +321,17 @@ class ResultBasicMethodTest {
 
         @Test
         void internalFailure() {
-            assertEquals(Result.fail(EXCEPTION), Result.fail(EXCEPTION));
+            assertEquals(Result.fail(INTERNAL_ERROR_MESSAGE, EXCEPTION), Result.fail(INTERNAL_ERROR_MESSAGE, EXCEPTION));
         }
 
         @Test
         void internalFailureNotEqual() {
-            assertNotEquals(Result.fail(EXCEPTION), Result.fail(new RuntimeException(ERROR_MESSAGE)));
+            assertNotEquals(Result.fail(INTERNAL_ERROR_MESSAGE, EXCEPTION), Result.fail(INTERNAL_ERROR_MESSAGE, new RuntimeException(ERROR_MESSAGE)));
+        }
+
+        @Test
+        void internalFailureNotEqualErrorMessage() {
+            assertNotEquals(Result.fail(INTERNAL_ERROR_MESSAGE + "-NOT-EQUAL", EXCEPTION), Result.fail(INTERNAL_ERROR_MESSAGE, EXCEPTION));
         }
     }
 
@@ -353,12 +359,35 @@ class ResultBasicMethodTest {
 
         @Test
         void internalFailure() {
-            assertEquals(Result.fail(EXCEPTION).hashCode(), Result.fail(EXCEPTION).hashCode());
+            assertEquals(Result.fail(INTERNAL_ERROR_MESSAGE, EXCEPTION).hashCode(), Result.fail(INTERNAL_ERROR_MESSAGE, EXCEPTION).hashCode());
         }
 
         @Test
         void internalFailureNotEqual() {
-            assertNotEquals(Result.fail(EXCEPTION).hashCode(), Result.fail(new RuntimeException(ERROR_MESSAGE)).hashCode());
+            assertNotEquals(Result.fail(INTERNAL_ERROR_MESSAGE, EXCEPTION).hashCode(), Result.fail(INTERNAL_ERROR_MESSAGE, new RuntimeException(ERROR_MESSAGE)).hashCode());
+        }
+
+        @Test
+        void internalFailureNotEqualErrorMessage() {
+            assertNotEquals(Result.fail(INTERNAL_ERROR_MESSAGE, EXCEPTION).hashCode(), Result.fail(INTERNAL_ERROR_MESSAGE + "-NOT-EQUAL", new RuntimeException(ERROR_MESSAGE)).hashCode());
+        }
+    }
+
+    @Nested
+    class ToString {
+        @Test
+        void success() {
+            assertEquals("Success{This is our result}", Result.of(RESULT_OBJECT).toString());
+        }
+
+        @Test
+        void failure() {
+            assertEquals("Failure{We failed}", Result.fail(ERROR_MESSAGE).toString());
+        }
+
+        @Test
+        void internalFailure() {
+            assertEquals("InternalFailure{java.lang.RuntimeException: Some Reason}", Result.fail(INTERNAL_ERROR_MESSAGE, EXCEPTION).toString());
         }
     }
 }

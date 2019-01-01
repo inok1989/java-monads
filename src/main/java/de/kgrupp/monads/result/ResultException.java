@@ -9,7 +9,7 @@ public class ResultException extends RuntimeException {
         super(message);
     }
 
-    ResultException(Throwable throwable) {
-        super(throwable);
+    ResultException(String message, Exception exception) {
+        super(message, exception);
     }
 }

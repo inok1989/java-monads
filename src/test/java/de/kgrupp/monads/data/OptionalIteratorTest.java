@@ -24,13 +24,13 @@ class OptionalIteratorTest {
     }
 
     @Test
-     void testInitialChecks() {
+    void initialChecks() {
         assertTrue(iterator.hasNext());
         assertTrue(iterator.hasCurrent());
     }
 
     @Test
-     void testGetCurrent() {
+    void getCurrent() {
         assertEquals("A", iterator.getCurrent());
         assertEquals(Optional.of("A"), iterator.getSafeCurrent());
         iterator.next();
@@ -39,21 +39,21 @@ class OptionalIteratorTest {
     }
 
     @Test
-     void testGetIfEmtpy() {
+    void getIfEmtpy() {
         iterator.next();
         iterator.next();
         assertThrows(NoSuchElementException.class, iterator::getCurrent);
     }
 
     @Test
-     void testGetSafeIfEmtpy() {
+    void getSafeIfEmtpy() {
         iterator.next();
         iterator.next();
         assertFalse(iterator.getSafeCurrent().isPresent());
     }
 
     @Test
-     void testTestOnCurrent() {
+    void testOnCurrent() {
         assertTrue(iterator.testOnCurrent("A"::equals));
         assertFalse(iterator.testOnCurrent("B"::equals));
         iterator.next();
@@ -63,13 +63,13 @@ class OptionalIteratorTest {
     }
 
     @Test
-     void testNextWithMatchNotFound() {
+    void nextWithMatchNotFound() {
         iterator.nextWithMatch("A"::equals);
         assertFalse(iterator.getSafeCurrent().isPresent());
     }
 
     @Test
-    void testNextWithMatchFound() {
+    void nextWithMatchFound() {
         iterator.nextWithMatch("B"::equals);
         assertTrue(iterator.getSafeCurrent().isPresent());
     }

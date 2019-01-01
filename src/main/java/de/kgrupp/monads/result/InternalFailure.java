@@ -7,11 +7,11 @@ import java.util.Objects;
  */
 public class InternalFailure<T> extends Failure<T> {
 
-    private final Throwable throwable;
+    private final Exception exception;
 
-    InternalFailure(String errorMessage, Throwable throwable) {
+    InternalFailure(String errorMessage, Exception exception) {
         super(errorMessage);
-        this.throwable = throwable;
+        this.exception = exception;
     }
 
     @Override
@@ -20,8 +20,13 @@ public class InternalFailure<T> extends Failure<T> {
     }
 
     @Override
-    public Throwable getThrowable() {
-        return throwable;
+    public T getObject() {
+        throw new UnsupportedOperationException(Helper.methodNotSupportedMessageBuilder(this), exception);
+    }
+
+    @Override
+    public Exception getException() {
+        return exception;
     }
 
     @Override
@@ -30,16 +35,16 @@ public class InternalFailure<T> extends Failure<T> {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         InternalFailure<?> that = (InternalFailure<?>) o;
-        return Objects.equals(throwable, that.throwable);
+        return Objects.equals(exception, that.exception);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), throwable);
+        return Objects.hash(super.hashCode(), exception);
     }
 
     @Override
     public String toString() {
-        return "InternalFailure{" + throwable + '}';
+        return "InternalFailure{" + exception + '}';
     }
 }

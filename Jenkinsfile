@@ -30,7 +30,7 @@ node {
                 }
             }
         }
-    } catch (Throwable t) {
+    } catch (Exception t) {
         throw t
     }
 }

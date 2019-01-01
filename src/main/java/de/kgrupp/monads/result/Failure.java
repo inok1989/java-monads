@@ -30,7 +30,7 @@ public class Failure<T> implements Result<T> {
 
     @Override
     public T getObject() {
-        throw new UnsupportedOperationException(Helper.THIS_METHOD_IS_NOT_SUPPORTED);
+        throw new UnsupportedOperationException(Helper.methodNotSupportedMessageBuilder(this));
     }
 
     @Override
@@ -39,8 +39,8 @@ public class Failure<T> implements Result<T> {
     }
 
     @Override
-    public Throwable getThrowable() {
-        throw new UnsupportedOperationException(Helper.THIS_METHOD_IS_NOT_SUPPORTED);
+    public Exception getException() {
+        throw new UnsupportedOperationException(Helper.methodNotSupportedMessageBuilder(this));
     }
 
     @Override

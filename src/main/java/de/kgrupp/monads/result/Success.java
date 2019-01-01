@@ -35,12 +35,12 @@ public class Success<T> implements Result<T> {
 
     @Override
     public String getErrorMessage() {
-        throw new UnsupportedOperationException(Helper.THIS_METHOD_IS_NOT_SUPPORTED);
+        throw new UnsupportedOperationException(Helper.methodNotSupportedMessageBuilder(this));
     }
 
     @Override
-    public Throwable getThrowable() {
-        throw new UnsupportedOperationException(Helper.THIS_METHOD_IS_NOT_SUPPORTED);
+    public Exception getException() {
+        throw new UnsupportedOperationException(Helper.methodNotSupportedMessageBuilder(this));
     }
 
     @Override

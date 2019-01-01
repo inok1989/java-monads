@@ -1,5 +1,6 @@
 package de.kgrupp.monads.result;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
@@ -16,140 +17,199 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ResultHigherOrderTest {
 
-    private Function<String, Boolean> map = str -> true;
-    private Function<String, Result<Boolean>> flatMap = str -> Result.of(true);
+    @Nested
+    class Map {
+        private Function<String, Boolean> map = str -> true;
 
-    @Test
-    void testMapSuccess() {
-        Result<Boolean> result = SUCCESS.map(map);
-        assertTrue(result.isSuccess());
-        assertTrue(result.getObject());
+        @Test
+        void success() {
+            Result<Boolean> result = SUCCESS.map(map);
+            assertTrue(result.isSuccess());
+            assertTrue(result.getObject());
+        }
+
+        @Test
+        void failure() {
+            Result<Boolean> result = FAILURE.map(map);
+            assertTrue(result.isError());
+            assertFalse(result.isInternalError());
+        }
+
+        @Test
+        void internalFailure() {
+            Result<Boolean> result = INTERNAL_FAILURE.map(map);
+            assertTrue(result.isError());
+            assertTrue(result.isInternalError());
+        }
     }
 
-    @Test
-    void testMapFailure() {
-        Result<Boolean> result = FAILURE.map(map);
-        assertTrue(result.isError());
-        assertFalse(result.isInternalError());
+    @Nested
+    class CheckedMap {
+        private CheckedFunction<String, Boolean> map = str -> true;
+
+        @Test
+        void success() {
+            Result<Boolean> result = SUCCESS.checkedMap(map);
+            assertTrue(result.isSuccess());
+            assertTrue(result.getObject());
+        }
+
+        @Test
+        void failure() {
+            Result<Boolean> result = FAILURE.checkedMap(map);
+            assertTrue(result.isError());
+            assertFalse(result.isInternalError());
+        }
+
+        @Test
+        void internalFailure() {
+            Result<Boolean> result = INTERNAL_FAILURE.checkedMap(map);
+            assertTrue(result.isError());
+            assertTrue(result.isInternalError());
+        }
+
+        @Test
+        void successToInternalFailure() {
+            Result<Boolean> result = SUCCESS.checkedMap(obj -> {
+                throw new RuntimeException("");
+            });
+            assertTrue(result.isError());
+            assertTrue(result.isInternalError());
+        }
     }
 
-    @Test
-    void testMapInternalFailure() {
-        Result<Boolean> result = INTERNAL_FAILURE.map(map);
-        assertTrue(result.isError());
-        assertTrue(result.isInternalError());
+    @Nested
+    class FlatMap {
+        private Function<String, Result<Boolean>> flatMap = str -> Result.of(true);
+
+        @Test
+        void success() {
+            Result<Boolean> result = SUCCESS.flatMap(flatMap);
+            assertTrue(result.isSuccess());
+            assertTrue(result.getObject());
+        }
+
+        @Test
+        void successWithMap() {
+            Function<String, Result<Boolean>> flatMapFails = str -> Result.fail(ERROR_MESSAGE);
+            Result<Boolean> result = SUCCESS.flatMap(flatMapFails);
+            assertTrue(result.isError());
+        }
+
+        @Test
+        void error() {
+            Result<Boolean> result = FAILURE.flatMap(flatMap);
+            assertTrue(result.isError());
+        }
     }
 
-    @Test
-    void testFlatMapSuccess() {
-        Result<Boolean> result = SUCCESS.flatMap(flatMap);
-        assertTrue(result.isSuccess());
-        assertTrue(result.getObject());
-    }
+    @Nested
+    class Filter {
+        @Test
+        void success() {
+            Result<String> result = SUCCESS.filter(str -> true, ERROR_MESSAGE);
+            assertTrue(result.isSuccess());
+        }
 
-    @Test
-    void testFlatMapSuccessWithMap() {
-        Function<String, Result<Boolean>> flatMapFails = str -> Result.fail(ERROR_MESSAGE);
-        Result<Boolean> result = SUCCESS.flatMap(flatMapFails);
-        assertTrue(result.isError());
-    }
-
-    @Test
-    void testFlatMapError() {
-        Result<Boolean> result = FAILURE.flatMap(flatMap);
-        assertTrue(result.isError());
-    }
-
-    @Test
-    void testFilter() {
-        Result<String> result = SUCCESS.filter(str -> true, ERROR_MESSAGE);
-        assertTrue(result.isSuccess());
-    }
-
-    @Test
-    void testFilterToError() {
-        Result<String> result = SUCCESS.filter(str -> false, ERROR_MESSAGE);
-        assertTrue(result.isError());
+        @Test
+        void successToError() {
+            Result<String> result = SUCCESS.filter(str -> false, ERROR_MESSAGE);
+            assertTrue(result.isError());
+        }
     }
 
     class ExecuteState {
         boolean executed = false;
     }
 
-    @Test
-    void testConsume() {
-        ExecuteState state = new ExecuteState();
-        SUCCESS.consume(str -> state.executed = true);
-        assertTrue(state.executed);
+    @Nested
+    class Consume {
+        @Test
+        void success() {
+            ExecuteState state = new ExecuteState();
+            SUCCESS.consume(str -> state.executed = true);
+            assertTrue(state.executed);
+        }
+
+        @Test
+        void failure() {
+            ExecuteState state = new ExecuteState();
+            FAILURE.consume(str -> state.executed = true);
+            assertFalse(state.executed);
+        }
     }
 
-    @Test
-    void testConsumeOnError() {
-        ExecuteState state = new ExecuteState();
-        FAILURE.consume(str -> state.executed = true);
-        assertFalse(state.executed);
+    @Nested
+    class ConsumeOrThrow {
+        @Test
+        void success() {
+            ExecuteState state = new ExecuteState();
+            SUCCESS.consumeOrThrow(str -> state.executed = true);
+            assertTrue(state.executed);
+        }
+
+        @Test
+        void failure() {
+            ExecuteState state = new ExecuteState();
+            assertThrows(ResultException.class, () -> FAILURE.consumeOrThrow(str -> state.executed = true));
+            assertFalse(state.executed);
+        }
     }
 
-    @Test
-    void testConsumeOrFail() {
-        ExecuteState state = new ExecuteState();
-        SUCCESS.consumeOrFail(str -> state.executed = true);
-        assertTrue(state.executed);
+    @Nested
+    class FlatRecover {
+        @Test
+        void success() {
+            Result<String> result = SUCCESS.flatRecover(failure -> null);
+            assertEquals(SUCCESS, result);
+        }
+
+        @Test
+        void error() {
+            Result<String> result = FAILURE.flatRecover(failure -> SUCCESS);
+            assertEquals(SUCCESS, result);
+        }
+
+        @Test
+        void internalFailure() {
+            Result<String> result = INTERNAL_FAILURE.flatRecover(failure -> SUCCESS);
+            assertEquals(SUCCESS, result);
+        }
+
+        @Test
+        void errorFails() {
+            Result<String> result = FAILURE.flatRecover(failure -> INTERNAL_FAILURE);
+            assertEquals(INTERNAL_FAILURE, result);
+        }
     }
 
-    @Test
-    void testConsumeOrFailOnError() {
-        ExecuteState state = new ExecuteState();
-        assertThrows(ResultException.class, () -> FAILURE.consumeOrFail(str -> state.executed = true));
-        assertFalse(state.executed);
+    @Nested
+    class Recover {
+        @Test
+        void success() {
+            Result<String> result = SUCCESS.recover(failure -> null);
+            assertEquals(SUCCESS, result);
+        }
+
+        @Test
+        void failure() {
+            Result<String> result = FAILURE.recover(failure -> RESULT_OBJECT);
+            assertEquals(SUCCESS, result);
+        }
     }
 
-    @Test
-    void testFlatRecoverSuccess() {
-        Result<String> result = SUCCESS.flatRecover(failure -> null);
-        assertEquals(SUCCESS, result);
-    }
+    @Nested
+    class FlatRunnable {
+        @Test
+        void success() {
+            Result<String> result = SUCCESS.flatRunnable(failure -> Result.emptySuccess());
+            assertEquals(SUCCESS, result);
+        }
 
-    @Test
-    void testFlatRecoverError() {
-        Result<String> result = FAILURE.flatRecover(failure -> SUCCESS);
-        assertEquals(SUCCESS, result);
+        @Test
+        void failure() {
+            Result<String> result = FAILURE.flatRunnable(failure -> SUCCESS);
+            assertEquals(FAILURE, result);
+        }
     }
-
-    @Test
-    void testFlatRecoverInternalFailure() {
-        Result<String> result = INTERNAL_FAILURE.flatRecover(failure -> SUCCESS);
-        assertEquals(SUCCESS, result);
-    }
-
-    @Test
-    void testFlatRecoverErrorFails() {
-        Result<String> result = FAILURE.flatRecover(failure -> INTERNAL_FAILURE);
-        assertEquals(INTERNAL_FAILURE, result);
-    }
-
-    @Test
-    void testRecoverSuccess() {
-        Result<String> result = SUCCESS.recover(failure -> null);
-        assertEquals(SUCCESS, result);
-    }
-
-    @Test
-    void testRecoverError() {
-        Result<String> result = FAILURE.recover(failure -> RESULT_OBJECT);
-        assertEquals(SUCCESS, result);
-    }
-
-    @Test
-    void testFlatRunnableSuccess() {
-        Result<String> result = SUCCESS.flatRunnable(failure -> Result.emptySuccess());
-        assertEquals(SUCCESS, result);
-    }
-
-    @Test
-    void testFlatRunnableError() {
-        Result<String> result = FAILURE.flatRunnable(failure -> SUCCESS);
-        assertEquals(FAILURE, result);
-    }
-
 }

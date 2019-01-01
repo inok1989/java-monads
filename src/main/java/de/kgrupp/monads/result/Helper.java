@@ -6,31 +6,34 @@ package de.kgrupp.monads.result;
  */
 final class Helper {
 
-    static final String THIS_METHOD_IS_NOT_SUPPORTED = "This method is not supported.";
-    private static final String SUCCESS_CAN_NOT_BE_CONVERTED = "Success can not be converted.";
+    static final String OPTIONAL_IS_EMPTY = "Optional is empty.";
+    private static final String SUCCESS_CAN_NOT_BE_CONVERTED = "Success can not be converted to another type.";
 
     private Helper() {
         // utility class
     }
 
+    static String methodNotSupportedMessageBuilder(Result<?> result) {
+        return String.format("This method is not supported result is %s(%s)", result.getClass().getName(), result.isError() ? result.getErrorMessage() : "");
+    }
+
     static <U, T> Result<U> transform(Result<T> result) {
-        if (result.isInternalError()) {
-            InternalFailure internalFailure = (InternalFailure) result;
-            return Result.fail(internalFailure.getThrowable());
-        } else if (result.isError()) {
-            return Result.fail(result.getErrorMessage());
-        } else {
+        if (result.isSuccess()) {
             throw new IllegalArgumentException(SUCCESS_CAN_NOT_BE_CONVERTED);
+        } else if (result.isInternalError()) {
+            return Result.fail(result.getErrorMessage(), result.getException());
+        } else {
+            return Result.fail(result.getErrorMessage());
         }
     }
 
     static ResultException toException(Result<?> result) {
-        if (result.isInternalError()) {
-            return new ResultException(result.getThrowable());
-        } else if (result.isError()) {
-            return new ResultException(result.getErrorMessage());
-        } else {
+        if (result.isSuccess()) {
             throw new IllegalArgumentException("A ResultException can not be build with a Success");
+        } else if (result.isInternalError()) {
+            return new ResultException(result.getErrorMessage(), result.getException());
+        } else {
+            return new ResultException(result.getErrorMessage());
         }
     }
 }

@@ -11,27 +11,41 @@ import java.util.function.Supplier;
  */
 public interface Result<T> {
 
-    String INTERNAL_FAILURE = "INTERNAL_FAILURE";
-
     boolean isError();
 
     boolean isInternalError();
 
     boolean isSuccess();
 
+    /**
+     * @throws UnsupportedOperationException when called on a {@see Failure} or {@see InternalFailure}
+     */
     T getObject();
 
+    /**
+     * Converts a result monad to an {@see Optional}
+     *
+     * @throws ResultException when result was {@see InternalFailure}
+     */
     default Optional<T> asOptional() {
-        if (isSuccess()) {
+        if (isInternalError()) {
+            throw Helper.toException(this);
+        } else if (isSuccess()) {
             return Optional.ofNullable(getObject());
         } else {
             return Optional.empty();
         }
     }
 
+    /**
+     * @throws UnsupportedOperationException when called on a {@see Success}
+     */
     String getErrorMessage();
 
-    Throwable getThrowable();
+    /**
+     * @throws UnsupportedOperationException when called on a {@see Success} or {@see Failure}
+     */
+    Exception getException();
 
     static <T> Result<T> of(T result) {
         return new Success<>(result);
@@ -47,8 +61,8 @@ public interface Result<T> {
     }
 
     // this is intended here to convert Optionals
-    static <T> Result<T> of(Optional<T> result, Supplier<? extends Throwable> throwableSupplier) {
-        return result.map(Result::of).orElseGet(() -> Result.fail(throwableSupplier.get()));
+    static <T> Result<T> of(Optional<T> result, Supplier<? extends Exception> exceptionSupplier) {
+        return result.map(Result::of).orElseGet(() -> Result.fail(Helper.OPTIONAL_IS_EMPTY, exceptionSupplier.get()));
     }
 
     static <T> Result<T> ofNullable(T result, String failureMessage) {
@@ -59,12 +73,22 @@ public interface Result<T> {
         return new Failure<>(errorMessage);
     }
 
-    static <T> Result<T> fail(Throwable throwable) {
-        return new InternalFailure<>(INTERNAL_FAILURE, throwable);
+    static <T> Result<T> fail(String errorMessage, Exception exception) {
+        return new InternalFailure<>(errorMessage, exception);
     }
 
     default <U> Result<U> map(Function<? super T, U> mapper) {
         return flatMap(obj -> Result.of(mapper.apply(getObject())));
+    }
+
+    default <U> Result<U> checkedMap(CheckedFunction<? super T, U> mapper) {
+        return flatMap(obj -> {
+            try {
+                return Result.of(mapper.apply(getObject()));
+            } catch (Exception e) {
+                return Result.fail("CheckedFunction failed with exception.", e);
+            }
+        });
     }
 
     default <U> Result<U> flatMap(Function<? super T, Result<U>> mapper) {
@@ -109,6 +133,9 @@ public interface Result<T> {
         }
     }
 
+    /**
+     * @throws ResultException when the current object is not {@see Success}
+     */
     default T orElseThrow() {
         if (isSuccess()) {
             return getObject();
@@ -123,7 +150,10 @@ public interface Result<T> {
         }
     }
 
-    default void consumeOrFail(Consumer<T> consumer) {
+    /**
+     * @throws ResultException when the current object is not {@see Success}
+     */
+    default void consumeOrThrow(Consumer<T> consumer) {
         if (isSuccess()) {
             consumer.accept(getObject());
         } else {

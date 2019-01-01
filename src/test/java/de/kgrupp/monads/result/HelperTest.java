@@ -1,5 +1,6 @@
 package de.kgrupp.monads.result;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -8,29 +9,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HelperTest {
 
-    @Test
-    void testTransformSuccess() {
-        // not possible for success
-        assertThrows(IllegalArgumentException.class, () -> Helper.transform(AbstractResultExamples.SUCCESS));
+    @Nested
+    class Transform {
+        @Test
+        void success() {
+            // not possible for success
+            assertThrows(IllegalArgumentException.class, () -> Helper.transform(AbstractResultExamples.SUCCESS));
+        }
+
+        @Test
+        void failure() {
+            Result<Integer> result = Helper.transform(AbstractResultExamples.FAILURE);
+            assertTrue(result.isError());
+            assertFalse(result.isInternalError());
+        }
+
+        @Test
+        void internalFailure() {
+            Result<Integer> result = Helper.transform(AbstractResultExamples.INTERNAL_FAILURE);
+            assertTrue(result.isError());
+            assertTrue(result.isInternalError());
+        }
     }
 
-    @Test
-    void testTransformFailure() {
-        Result<Integer> result = Helper.transform(AbstractResultExamples.FAILURE);
-        assertTrue(result.isError());
-        assertFalse(result.isInternalError());
-    }
-
-    @Test
-    void testTransformInternalFailure() {
-        Result<Integer> result = Helper.transform(AbstractResultExamples.INTERNAL_FAILURE);
-        assertTrue(result.isError());
-        assertTrue(result.isInternalError());
-    }
-
-    @Test
-    void testToExceptionSuccess() {
-        // not possible for success
-        assertThrows(IllegalArgumentException.class, () -> Helper.toException(AbstractResultExamples.SUCCESS));
+    @Nested
+    class ToException {
+        @Test
+        void success() {
+            // not possible for success
+            assertThrows(IllegalArgumentException.class, () -> Helper.toException(AbstractResultExamples.SUCCESS));
+        }
     }
 }
