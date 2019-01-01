@@ -18,14 +18,15 @@ public interface Result<T> {
     boolean isSuccess();
 
     /**
-     * @throws UnsupportedOperationException when called on a {@see Failure} or {@see InternalFailure}
+     * @return the object which is stored in the success
+     * @throws UnsupportedOperationException when called on a {@link Failure} or {@link InternalFailure}
      */
     T getObject();
 
     /**
-     * Converts a result monad to an {@see Optional}
+     * Converts a result monad to an {@link Optional}
      *
-     * @throws ResultException when result was {@see InternalFailure}
+     * @throws ResultException when result was {@link InternalFailure}
      */
     default Optional<T> asOptional() {
         if (isInternalError()) {
@@ -38,12 +39,14 @@ public interface Result<T> {
     }
 
     /**
-     * @throws UnsupportedOperationException when called on a {@see Success}
+     * @return the reason why it failed
+     * @throws UnsupportedOperationException when called on a {@link Success}
      */
     String getErrorMessage();
 
     /**
-     * @throws UnsupportedOperationException when called on a {@see Success} or {@see Failure}
+     * @return the exception which was thrown while the pipeline failed
+     * @throws UnsupportedOperationException when called on a {@link Success} or {@link Failure}
      */
     Exception getException();
 
@@ -134,7 +137,8 @@ public interface Result<T> {
     }
 
     /**
-     * @throws ResultException when the current object is not {@see Success}
+     * @return the object which is stored {@link #getObject}
+     * @throws ResultException when the current object is not {@link Success}
      */
     default T orElseThrow() {
         if (isSuccess()) {
@@ -151,7 +155,8 @@ public interface Result<T> {
     }
 
     /**
-     * @throws ResultException when the current object is not {@see Success}
+     * @param consumer the function which can consume the stored object
+     * @throws ResultException when the current object is not {@link Success}
      */
     default void consumeOrThrow(Consumer<T> consumer) {
         if (isSuccess()) {
